@@ -3,12 +3,12 @@
   "seed": 20261115,
   "gomaxprocs": 4,
   "cooldown": "120s",
-  "pre_vus": 50,
+  "pre_vus": 100,
   "max_vus": 400,
   "cells": [
-    {"pair": ["stdlib", "goccy"], "fixture": "f1-64k", "workload": "ramp", "knee": 1000, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
-    {"pair": ["stdlib", "goccy"], "fixture": "f2-256k", "workload": "ramp", "knee": 250, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
-    {"pair": ["stdlib", "goccy"], "fixture": "f3-1m", "workload": "ramp", "knee": 60, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
-    {"pair": ["stdlib-legacy", "goccy-legacy"], "fixture": "f1-64k", "workload": "ramp", "knee": 1000, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1}
+    {"pair": ["stdlib", "goccy"], "fixture": "f1-64k", "workload": "ramp", "knee": 5000, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
+    {"pair": ["stdlib", "goccy"], "fixture": "f2-256k", "workload": "ramp", "knee": 1250, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
+    {"pair": ["stdlib", "goccy"], "fixture": "f3-1m", "workload": "ramp", "knee": 320, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1},
+    {"pair": ["stdlib-legacy", "goccy-legacy"], "fixture": "f1-64k", "workload": "ramp", "knee": 5000, "steps": "10,20,35,50,65,80,90,100,120,150", "step_dur": "2m", "reps": 1}
   ]
 }
