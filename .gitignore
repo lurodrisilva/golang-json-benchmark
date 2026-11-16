@@ -1,0 +1,12 @@
+# build outputs
+/bin/
+# raw benchmark runs (large; may hold host details) — publish curated reports only
+/results/
+# local generated outputs
+/reports/bench/
+/reports/conformance/
+# agent/operator state
+/.omc/
+*.test
+*.prof
+.DS_Store

@@ -1,0 +1,42 @@
+# Correctness only. CI runners are noisy shared VMs: no performance numbers are produced or trusted here.
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  correctness:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.27.4"
+          cache-dependency-path: |
+            service/go.sum
+            tools/go.mod
+      - name: Verify toolchain
+        run: go version && go list -f '{{.GoFiles}}' encoding/json
+      - name: Verify go-json module checksum
+        run: cd service && go mod verify
+      - name: Fixtures are deterministic and match checksums
+        run: |
+          make fixtures
+          git diff --exit-code -- fixtures/
+          make fixtures-verify
+      - name: Vet
+        run: make vet
+      - name: Tests (default + nojsonv2 + minimal)
+        run: make test
+      - name: Race
+        run: make race
+      - name: Conformance matrices
+        run: make conformance
+      - name: Smoke-build all arms
+        run: make build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conformance
+          path: reports/conformance/
