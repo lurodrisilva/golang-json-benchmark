@@ -31,9 +31,19 @@ const srvHdl = new Trend('srv_hdl', true);
 const non202 = new Counter('non_202');
 const transportErrors = new Counter('transport_errors');
 
+// VU pools are sized per scenario from its own rate so that a short host
+// stall (pilot [M]: ~100-300 ms bursts at 3-6k rps) is absorbed and shows up
+// as latency instead of dropped_iterations: preallocated >= rate x 0.1 s,
+// max >= rate x 0.3 s, never below PRE_VUS / MAX_VUS. Each VU holds its own
+// copy of the fixture, so the pools are capped by these factors (k6 RSS).
+const PRE_VUS = parseInt(env.PRE_VUS || '50', 10);
+const MAX_VUS = parseInt(env.MAX_VUS || '400', 10);
+function pool(rate) {
+  const pre = Math.max(PRE_VUS, Math.ceil(rate * 0.1));
+  return { preAllocatedVUs: pre, maxVUs: Math.max(MAX_VUS, pre, Math.ceil(rate * 0.3)) };
+}
+
 function scenarios() {
-  const preVUs = parseInt(env.PRE_VUS || '50', 10);
-  const maxVUs = parseInt(env.MAX_VUS || '400', 10);
   if (WORKLOAD === 'smoke') {
     return { smoke: { executor: 'shared-iterations', vus: 1, iterations: 20, maxDuration: '60s', tags: { phase: 'measure' } } };
   }
@@ -42,10 +52,10 @@ function scenarios() {
     const s = {};
     if (env.WARMUP && env.WARMUP !== '0s') {
       s.warmup = { executor: 'constant-arrival-rate', rate, timeUnit: '1s', duration: env.WARMUP,
-        preAllocatedVUs: preVUs, maxVUs, tags: { phase: 'warmup' } };
+        ...pool(rate), tags: { phase: 'warmup' } };
     }
     s.measure = { executor: 'constant-arrival-rate', rate, timeUnit: '1s', duration: env.DURATION,
-      preAllocatedVUs: preVUs, maxVUs, startTime: env.WARMUP || '0s', tags: { phase: 'measure' } };
+      ...pool(rate), startTime: env.WARMUP || '0s', tags: { phase: 'measure' } };
     return s;
   }
   if (WORKLOAD === 'ramp') {
@@ -57,9 +67,11 @@ function scenarios() {
     const s = {};
     const secs = parseDur(stepDur);
     pct.forEach((p, i) => {
+      const rate = Math.max(1, Math.round(knee * p / 100));
+      // gracefulStop 5s: limits overlap with the next step's pool.
       s[`step_${String(i).padStart(2, '0')}`] = { executor: 'constant-arrival-rate',
-        rate: Math.max(1, Math.round(knee * p / 100)), timeUnit: '1s', duration: stepDur,
-        preAllocatedVUs: preVUs, maxVUs, startTime: `${i * secs}s`,
+        rate, timeUnit: '1s', duration: stepDur, gracefulStop: '5s',
+        ...pool(rate), startTime: `${i * secs}s`,
         tags: { phase: 'measure', step: String(i), step_pct: String(p) } };
     });
     return s;

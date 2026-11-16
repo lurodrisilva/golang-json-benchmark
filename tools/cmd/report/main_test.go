@@ -120,6 +120,8 @@ func TestKnee(t *testing.T) {
 		{"throughput knee", []step{mk(100, 100, 1, 1000), mk(200, 190, 1, 1000)}, "100 rps"},
 		{"drops", []step{mk(100, 100, 1, 1000), {Offered: 200, Achieved: 200, P95: 1, Count: 1000, Dropped: 1}}, "100 rps"},
 		{"below lowest", []step{mk(100, 50, 1, 1000)}, "below lowest step"},
+		{"censored", []step{mk(100, 100, 1, 1000), mk(200, 200, 1, 1000)}, ">= 200 rps (not reached"},
+		{"single passing step is censored", []step{mk(100, 100, 1, 1000)}, ">= 100 rps (not reached"},
 	}
 	for _, c := range cases {
 		if got := knee(c.ss); !strings.HasPrefix(got, c.want) {

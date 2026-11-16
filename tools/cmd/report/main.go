@@ -527,10 +527,15 @@ func knee(ss []step) string {
 	}
 	ref := ss[0].P95
 	best := ""
-	for _, s := range ss {
+	for i, s := range ss {
 		ok := s.Offered > 0 && s.Count >= kneeMinSamples && s.Achieved >= 0.99*s.Offered && s.Dropped == 0 && s.Non202 == 0 && (ref == 0 || s.P95 <= 3*ref)
 		if !ok {
 			break
+		}
+		if i == len(ss)-1 {
+			// Right-censored: the highest offered step still passed, so the
+			// knee is only bounded from below. Never report it as a knee.
+			return fmt.Sprintf(">= %.0f rps (not reached; highest step passed)", s.Offered)
 		}
 		best = fmt.Sprintf("%.0f rps (step %d)", s.Offered, s.Index)
 	}

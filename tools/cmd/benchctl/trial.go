@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"syscall"
@@ -119,6 +120,8 @@ type TrialResult struct {
 	BinarySHA  string              `json:"binary_sha256"`
 	FixtureSHA string              `json:"fixture_sha256"`
 	Profiles   []ProfileWindow     `json:"profiles,omitempty"`
+	// HostTopBefore lists processes using >=5% of one core before the trial.
+	HostTopBefore []string `json:"host_top_before,omitempty"`
 }
 
 // Window is the measured interval, bounded by two /metrics snapshots taken
@@ -177,7 +180,7 @@ func runTrial(ctx context.Context, s TrialSpec) (*TrialResult, error) {
 			return finish(err)
 		}
 	}
-	res.Host["idle_cpu_pct_before"] = hostBusyPct()
+	res.Host["idle_cpu_pct_before"], res.HostTopBefore = hostBusyPct()
 	res.Host["cpu_speed_limit_before"] = float64(thermal())
 	swap0 := swapouts()
 
@@ -473,15 +476,32 @@ func finalCounts(r *TrialResult, path string) {
 }
 
 // hostBusyPct sums %cpu over all processes, as a fraction of total capacity.
-func hostBusyPct() float64 {
-	out, err := exec.Command("ps", "-A", "-o", "%cpu=").Output()
+// It also returns the top consumers (command basename only, no arguments, so
+// no paths or secrets reach the artifacts) to explain a "host busy" flag.
+func hostBusyPct() (float64, []string) {
+	out, err := exec.Command("ps", "-A", "-o", "%cpu=,comm=").Output()
 	if err != nil {
-		return -1
+		return -1, nil
 	}
+	type p struct {
+		cpu  float64
+		name string
+	}
+	var ps []p
 	s := 0.0
-	for _, f := range strings.Fields(string(out)) {
-		v, _ := strconv.ParseFloat(f, 64)
+	for _, line := range strings.Split(string(out), "\n") {
+		f := strings.Fields(line)
+		if len(f) < 2 {
+			continue
+		}
+		v, _ := strconv.ParseFloat(f[0], 64)
 		s += v
+		ps = append(ps, p{v, filepath.Base(strings.Join(f[1:], " "))})
 	}
-	return s / float64(runtime.NumCPU())
+	sort.Slice(ps, func(i, j int) bool { return ps[i].cpu > ps[j].cpu })
+	var top []string
+	for i := 0; i < len(ps) && i < 5 && ps[i].cpu >= 5; i++ {
+		top = append(top, fmt.Sprintf("%s %.0f%%", ps[i].name, ps[i].cpu))
+	}
+	return s / float64(runtime.NumCPU()), top
 }

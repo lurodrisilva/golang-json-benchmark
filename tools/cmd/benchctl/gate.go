@@ -156,7 +156,7 @@ func gate(r *TrialResult) {
 		}
 	}
 	if v := r.Host["idle_cpu_pct_before"]; v > gateIdleBusyFlagPct {
-		r.flag("host busy %.1f%% before trial", v)
+		r.flag("host busy %.1f%% before trial (top: %s)", v, strings.Join(r.HostTopBefore, ", "))
 	}
 	if r.Spec.Profile != "none" {
 		r.flag("profiling active: not a primary latency trial")
