@@ -1,0 +1,28 @@
+File: goccy-legacy-server
+Type: cpu
+Time: 2026-11-16 19:27:00 -03
+Duration: 60.14s, Total samples = 33.77s (56.15%)
+Showing nodes accounting for 31.77s, 94.08% of 33.77s total
+Dropped 198 nodes (cum <= 0.17s)
+Showing top 20 nodes out of 104
+      flat  flat%   sum%        cum   cum%
+    23.69s 70.15% 70.15%     23.69s 70.15%  syscall.rawsyscalln
+     3.25s  9.62% 79.77%      3.25s  9.62%  runtime.kevent
+     1.06s  3.14% 82.91%      1.06s  3.14%  runtime.pthread_cond_wait
+     0.93s  2.75% 85.67%      0.93s  2.75%  runtime.pthread_cond_signal
+     0.87s  2.58% 88.24%      0.87s  2.58%  runtime.pthread_kill
+     0.78s  2.31% 90.55%      0.78s  2.31%  runtime.usleep
+     0.36s  1.07% 91.62%      0.39s  1.15%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).str
+     0.18s  0.53% 92.15%      0.23s  0.68%  github.com/goccy/go-json/internal/decoder.(*structDecoder).decodeKey
+     0.18s  0.53% 92.69%      0.32s  0.95%  runtime.pcvalue
+     0.11s  0.33% 93.01%      0.24s  0.71%  runtime.scanObjectsSmall
+     0.08s  0.24% 93.25%      0.74s  2.19%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).object
+     0.05s  0.15% 93.40%      0.19s  0.56%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).decodeStringField
+     0.05s  0.15% 93.54%      0.24s  0.71%  runtime.(*unwinder).resolveInternal
+     0.04s  0.12% 93.66%      0.98s  2.90%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+     0.03s 0.089% 93.75%      0.74s  2.19%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).value
+     0.03s 0.089% 93.84%      0.21s  0.62%  runtime.(*stkframe).getStackMap
+     0.02s 0.059% 93.90%      0.26s  0.77%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+     0.02s 0.059% 93.96%      0.98s  2.90%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+     0.02s 0.059% 94.02%      0.22s  0.65%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).Decode
+     0.02s 0.059% 94.08%      0.31s  0.92%  runtime.(*unwinder).next

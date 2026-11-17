@@ -1,0 +1,22 @@
+File: stdlib-legacy-server
+Type: inuse_objects
+Time: 2026-11-16 19:24:00 -03
+Showing nodes accounting for 46119, 100% of 46126 total
+Dropped 1 node (cum <= 230)
+Showing top 15 nodes out of 40
+      flat  flat%   sum%        cum   cum%
+     32768 71.04% 71.04%      32768 71.04%  reflect.unsafe_New
+      6809 14.76% 85.80%       6809 14.76%  runtime.mallocgc
+      2795  6.06% 91.86%       2795  6.06%  reflect.growslice
+      1820  3.95% 95.81%       1820  3.95%  reflect.mapassign_faststr0
+      1285  2.79% 98.59%       1285  2.79%  bufio.NewReaderSize (inline)
+       642  1.39%   100%        642  1.39%  bufio.NewWriterSize
+         0     0%   100%       1285  2.79%  bufio.NewReader
+         0     0%   100%      37383 81.05%  encoding/json.(*decodeState).array
+         0     0%   100%      37383 81.05%  encoding/json.(*decodeState).object
+         0     0%   100%      37383 81.05%  encoding/json.(*decodeState).unmarshal
+         0     0%   100%      37383 81.05%  encoding/json.(*decodeState).value
+         0     0%   100%      37383 81.05%  encoding/json.Unmarshal
+         0     0%   100%      37383 81.05%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal
+         0     0%   100%      37390 81.06%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0%   100%      37390 81.06%  net/http.(*ServeMux).ServeHTTP

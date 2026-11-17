@@ -1,0 +1,88 @@
+{"dir":"trials/stdlib/f1-64k/fixed-r3200-prof-allocs/rep-01","reasons":["host busy 13.3% before trial (top: node 36%, claude 27%, WindowServer 12%, benchctl 7%, stable 7%)","profiling active: not a primary latency trial"],"seq":1,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":2,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/ramp-k320/rep-01","reasons":null,"seq":3,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/ramp-k320/rep-01","reasons":null,"seq":4,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/ramp-k1250/rep-01","reasons":["host busy 11.7% before trial (top: mediaanalysisd 28%, Code Helper 21%, WindowServer 15%, Microsoft Outlook 7%, Code Helper (Renderer) 5%)"],"seq":5,"status":"flagged"}
+{"dir":"trials/stdlib/f2-256k/ramp-k1250/rep-01","reasons":["swapouts during trial=18402","host busy 15.0% before trial (top: corespotlightd 109%)"],"seq":6,"status":"invalid"}
+{"dir":"trials/stdlib/f1-64k/ramp-k5000/rep-01","reasons":["swapouts during trial=8005"],"seq":7,"status":"invalid"}
+{"dir":"trials/goccy/f1-64k/ramp-k5000/rep-01","reasons":null,"seq":8,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r256/rep-01","reasons":null,"seq":9,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256/rep-01","reasons":null,"seq":10,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256/rep-02","reasons":null,"seq":11,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r256/rep-02","reasons":["host busy 34.7% before trial (top: corespotlightd 130%, duetexpertd 76%, WindowServer 24%, corebrightnessd 12%, ControlCenter 7%)"],"seq":12,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/fixed-r256/rep-03","reasons":null,"seq":13,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256/rep-03","reasons":null,"seq":14,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256/rep-04","reasons":null,"seq":15,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r256/rep-04","reasons":null,"seq":16,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r256/rep-05","reasons":null,"seq":17,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256/rep-05","reasons":null,"seq":18,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r160/rep-01","reasons":null,"seq":19,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r160/rep-01","reasons":null,"seq":20,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r160/rep-02","reasons":["host busy 26.5% before trial (top: corespotlightd 143%, Code Helper 27%, WindowServer 18%, Code Helper (Renderer) 6%)"],"seq":21,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/fixed-r160/rep-02","reasons":null,"seq":22,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r160/rep-03","reasons":null,"seq":23,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r160/rep-03","reasons":null,"seq":24,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r160/rep-04","reasons":null,"seq":25,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r160/rep-04","reasons":null,"seq":26,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/fixed-r160/rep-05","reasons":null,"seq":27,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r160/rep-05","reasons":null,"seq":28,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200/rep-01","reasons":null,"seq":29,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200/rep-01","reasons":null,"seq":30,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200/rep-02","reasons":null,"seq":31,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200/rep-02","reasons":null,"seq":32,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200/rep-03","reasons":null,"seq":33,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200/rep-03","reasons":null,"seq":34,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200/rep-04","reasons":null,"seq":35,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200/rep-04","reasons":null,"seq":36,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200/rep-05","reasons":null,"seq":37,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200/rep-05","reasons":null,"seq":38,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r625/rep-01","reasons":null,"seq":39,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r625/rep-01","reasons":null,"seq":40,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r625/rep-02","reasons":null,"seq":41,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r625/rep-02","reasons":null,"seq":42,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r625/rep-03","reasons":null,"seq":43,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r625/rep-03","reasons":null,"seq":44,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r625/rep-04","reasons":["host busy 16.7% before trial (top: corespotlightd 114%, WindowServer 10%)"],"seq":45,"status":"flagged"}
+{"dir":"trials/goccy/f2-256k/fixed-r625/rep-04","reasons":null,"seq":46,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r625/rep-05","reasons":null,"seq":47,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r625/rep-05","reasons":null,"seq":48,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r3200-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":49,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/fixed-r3200-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":50,"status":"flagged"}
+{"dir":"trials/stdlib/f2-256k/fixed-r1000/rep-01","reasons":null,"seq":51,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r1000/rep-01","reasons":null,"seq":52,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r1000/rep-02","reasons":null,"seq":53,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r1000/rep-02","reasons":null,"seq":54,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r1000/rep-03","reasons":null,"seq":55,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r1000/rep-03","reasons":null,"seq":56,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/fixed-r1000/rep-04","reasons":null,"seq":57,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r1000/rep-04","reasons":null,"seq":58,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/fixed-r1000/rep-05","reasons":["dropped_iterations=13115","achieved 0.9563 of offered (\u003c 0.99)","non-202 fraction 0.00119 \u003e 0.001","transport errors/timeouts=340","host busy 80.1% before trial (top: Comet Helper (Aperitif Renderer) 144%, Comet Helper (Aperitif Renderer) 86%, MTLCompilerService 67%, Comet 65%, Comet Helper (Aperitif Renderer) 45%)"],"seq":59,"status":"invalid"}
+{"dir":"trials/goccy/f2-256k/fixed-r1000/rep-05","reasons":null,"seq":60,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/fixed-r256-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":61,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":62,"status":"flagged"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":63,"status":"flagged"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625-prof-cpu/rep-01","reasons":["host busy 20.3% before trial (top: Comet Helper (Aperitif Renderer) 96%, Comet 16%, WindowServer 15%, loginwindow 11%, WallpaperAerialsExtension 6%)","profiling active: not a primary latency trial"],"seq":64,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/fixed-r2000/rep-01","reasons":["host busy 11.9% before trial (top: WindowServer 36%, loginwindow 33%, WallpaperAerialsExtension 9%)"],"seq":65,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/fixed-r2000/rep-01","reasons":["host busy 16.4% before trial (top: corespotlightd 124%)"],"seq":66,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/fixed-r2000/rep-02","reasons":["dropped_iterations=22"],"seq":67,"status":"invalid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r2000/rep-02","reasons":null,"seq":68,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r2000/rep-03","reasons":null,"seq":69,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r2000/rep-03","reasons":null,"seq":70,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r2000/rep-04","reasons":["host busy 14.4% before trial (top: duetexpertd 97%)"],"seq":71,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/fixed-r2000/rep-04","reasons":null,"seq":72,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/fixed-r2000/rep-05","reasons":null,"seq":73,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/fixed-r2000/rep-05","reasons":null,"seq":74,"status":"valid"}
+{"dir":"trials/goccy-legacy/f1-64k/ramp-k5000/rep-01","reasons":null,"seq":75,"status":"valid"}
+{"dir":"trials/stdlib-legacy/f1-64k/ramp-k5000/rep-01","reasons":["host busy 14.7% before trial (top: spotlightknowledged 98%)"],"seq":76,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/fixed-r256-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":77,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/fixed-r256-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":78,"status":"flagged"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625/rep-01","reasons":null,"seq":79,"status":"valid"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625/rep-01","reasons":null,"seq":80,"status":"valid"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625/rep-02","reasons":null,"seq":81,"status":"valid"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625/rep-02","reasons":null,"seq":82,"status":"valid"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625/rep-03","reasons":null,"seq":83,"status":"valid"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625/rep-03","reasons":null,"seq":84,"status":"valid"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625/rep-04","reasons":null,"seq":85,"status":"valid"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625/rep-04","reasons":null,"seq":86,"status":"valid"}
+{"dir":"trials/stdlib-legacy/f1-64k/fixed-r1625/rep-05","reasons":["dropped_iterations=10","host busy 12.9% before trial (top: spotlightknowledged 100%)"],"seq":87,"status":"invalid"}
+{"dir":"trials/goccy-legacy/f1-64k/fixed-r1625/rep-05","reasons":["host busy 20.9% before trial (top: WindowServer 41%, Comet Helper (Aperitif Renderer) 32%, Comet Helper (Aperitif) 14%, Comet 13%, Comet Helper (Aperitif Renderer) 11%)"],"seq":88,"status":"flagged"}

@@ -1,0 +1,21 @@
+File: goccy-server
+Type: inuse_space
+Time: 2026-11-16 22:04:14 -03
+Showing nodes accounting for 9334.48kB, 100% of 9334.48kB total
+Showing top 15 nodes out of 44
+      flat  flat%   sum%        cum   cum%
+ 2381.27kB 25.51% 25.51%  2381.27kB 25.51%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).SetInput (inline)
+ 2048.56kB 21.95% 47.46%  2048.56kB 21.95%  reflect.mapassign_faststr0
+ 1190.64kB 12.76% 60.21%  1190.64kB 12.76%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+ 1025.23kB 10.98% 71.20%  1025.23kB 10.98%  runtime.mallocgc
+  636.73kB  6.82% 78.02%   636.73kB  6.82%  reflect.growslice
+     514kB  5.51% 83.52%      514kB  5.51%  bufio.NewReaderSize (inline)
+     514kB  5.51% 89.03%      514kB  5.51%  bufio.NewWriterSize (inline)
+  512.03kB  5.49% 94.51%  7797.24kB 83.53%  net/http.(*conn).serve
+  512.01kB  5.49%   100%   512.01kB  5.49%  net/http.(*Server).Serve
+         0     0%   100%      514kB  5.51%  bufio.NewReader (inline)
+         0     0%   100%  5066.57kB 54.28%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0%   100%  5066.57kB 54.28%  github.com/goccy/go-json.unmarshal
+         0     0%   100%  2048.56kB 21.95%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+         0     0%   100%  2685.29kB 28.77%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+         0     0%   100%   636.73kB  6.82%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).bufElem

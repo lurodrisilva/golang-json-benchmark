@@ -1,0 +1,21 @@
+File: stdlib-legacy-server
+Type: inuse_space
+Time: 2026-11-16 19:24:00 -03
+Showing nodes accounting for 11848.41kB, 100% of 11848.41kB total
+Showing top 15 nodes out of 41
+      flat  flat%   sum%        cum   cum%
+ 5140.03kB 43.38% 43.38%  5140.03kB 43.38%  bufio.NewReaderSize (inline)
+ 2570.01kB 21.69% 65.07%  2570.01kB 21.69%  bufio.NewWriterSize
+ 1537.28kB 12.97% 78.05%  1537.28kB 12.97%  runtime.mallocgc
+ 1028.10kB  8.68% 86.72%  1028.10kB  8.68%  reflect.growslice
+  548.84kB  4.63% 91.36%   548.84kB  4.63%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+  512.14kB  4.32% 95.68%   512.14kB  4.32%  reflect.mapassign_faststr0
+  512.01kB  4.32%   100%   512.01kB  4.32%  reflect.unsafe_New
+         0     0%   100%  5140.03kB 43.38%  bufio.NewReader
+         0     0%   100%  2052.25kB 17.32%  encoding/json.(*decodeState).array
+         0     0%   100%  2052.25kB 17.32%  encoding/json.(*decodeState).object
+         0     0%   100%  2052.25kB 17.32%  encoding/json.(*decodeState).unmarshal
+         0     0%   100%  2052.25kB 17.32%  encoding/json.(*decodeState).value
+         0     0%   100%  2052.25kB 17.32%  encoding/json.Unmarshal
+         0     0%   100%  2052.25kB 17.32%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal
+         0     0%   100%  2601.09kB 21.95%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP

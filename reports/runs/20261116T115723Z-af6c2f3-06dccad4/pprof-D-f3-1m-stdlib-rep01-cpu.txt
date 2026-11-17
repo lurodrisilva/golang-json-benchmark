@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: cpu
+Time: 2026-11-16 21:55:13 -03
+Duration: 60.15s, Total samples = 123.56s (205.43%)
+Showing nodes accounting for 108.69s, 87.97% of 123.56s total
+Dropped 322 nodes (cum <= 0.62s)
+Showing top 20 nodes out of 127
+      flat  flat%   sum%        cum   cum%
+    34.20s 27.68% 27.68%     34.20s 27.68%  runtime.madvise
+    22.52s 18.23% 45.90%     22.52s 18.23%  syscall.rawsyscalln
+    19.99s 16.18% 62.08%        20s 16.19%  runtime.usleep
+    13.82s 11.18% 73.27%     13.82s 11.18%  runtime.pthread_kill
+     4.02s  3.25% 76.52%      4.02s  3.25%  runtime.procyieldAsm
+     2.22s  1.80% 78.32%      2.22s  1.80%  encoding/json/internal/jsonwire.ConsumeSimpleString (inline)
+     1.75s  1.42% 79.73%      1.75s  1.42%  runtime.kevent
+     1.50s  1.21% 80.95%      1.50s  1.21%  runtime.pthread_cond_wait
+     1.12s  0.91% 81.85%      1.12s  0.91%  encoding/json/internal/jsonwire.ConsumeWhitespace (inline)
+     1.07s  0.87% 82.72%      5.90s  4.78%  encoding/json/jsontext.(*decoderState).consumeValue
+     1.01s  0.82% 83.54%      4.81s  3.89%  encoding/json/jsontext.(*decoderState).ReadValue
+     0.79s  0.64% 84.18%      1.51s  1.22%  encoding/json/jsontext.(*decoderState).PeekKind
+     0.74s   0.6% 84.78%      0.97s  0.79%  encoding/json/jsontext.(*decoderState).ReadToken
+     0.73s  0.59% 85.37%     18.93s 15.32%  encoding/json/v2.makeStructArshaler.func3
+     0.69s  0.56% 85.93%      0.80s  0.65%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).str
+     0.68s  0.55% 86.48%      0.68s  0.55%  runtime.pthread_cond_signal
+     0.57s  0.46% 86.94%      0.94s  0.76%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.43s  0.35% 87.29%      1.26s  1.02%  encoding/json/v2.makeString
+     0.42s  0.34% 87.63%      0.85s  0.69%  encoding/json/internal/jsonwire.ConsumeStringResumable
+     0.42s  0.34% 87.97%      2.51s  2.03%  encoding/json/jsontext.(*decoderState).consumeObject

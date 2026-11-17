@@ -1,0 +1,28 @@
+File: goccy-server
+Type: cpu
+Time: 2026-11-16 17:42:54 -03
+Duration: 60.15s, Total samples = 69.67s (115.83%)
+Showing nodes accounting for 62.48s, 89.68% of 69.67s total
+Dropped 366 nodes (cum <= 0.35s)
+Showing top 20 nodes out of 121
+      flat  flat%   sum%        cum   cum%
+    47.16s 67.69% 67.69%     47.17s 67.70%  syscall.rawsyscalln
+     5.66s  8.12% 75.81%      5.66s  8.12%  runtime.kevent
+     2.18s  3.13% 78.94%      2.18s  3.13%  runtime.pthread_kill
+     1.25s  1.79% 80.74%      1.25s  1.79%  runtime.pthread_cond_wait
+     1.25s  1.79% 82.53%      1.25s  1.79%  runtime.usleep
+     0.67s  0.96% 83.49%      0.79s  1.13%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).str
+     0.62s  0.89% 84.38%      0.62s  0.89%  runtime.pthread_cond_signal
+     0.53s  0.76% 85.14%      0.66s  0.95%  github.com/goccy/go-json/internal/decoder.(*structDecoder).decodeKey
+     0.50s  0.72% 85.86%      1.96s  2.81%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).decodeStringField
+     0.37s  0.53% 86.39%      0.45s  0.65%  runtime.tryDeferToSpanScan
+     0.35s   0.5% 86.90%      0.35s   0.5%  github.com/goccy/go-json/internal/decoder.skipWhiteSpace (inline)
+     0.31s  0.44% 87.34%      0.68s  0.98%  runtime.pcvalue
+     0.30s  0.43% 87.77%      0.57s  0.82%  runtime.mallocgcTinySC2
+     0.27s  0.39% 88.16%      0.37s  0.53%  github.com/goccy/go-json/internal/jsonnum.ParseFloatTerminated
+     0.25s  0.36% 88.52%      1.54s  2.21%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).object
+     0.21s   0.3% 88.82%      6.60s  9.47%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+     0.19s  0.27% 89.09%      0.41s  0.59%  runtime.scanObjectsSmall
+     0.15s  0.22% 89.31%      1.05s  1.51%  runtime.slicebytetostring
+     0.14s   0.2% 89.51%      1.88s  2.70%  runtime.mallocgc
+     0.12s  0.17% 89.68%      0.49s   0.7%  runtime.(*stkframe).getStackMap

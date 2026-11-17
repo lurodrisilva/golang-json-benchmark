@@ -1,0 +1,21 @@
+File: stdlib-server
+Type: inuse_space
+Time: 2026-11-16 17:39:53 -03
+Showing nodes accounting for 19006.89kB, 100% of 19006.89kB total
+Showing top 15 nodes out of 48
+      flat  flat%   sum%        cum   cum%
+ 7196.04kB 37.86% 37.86%  7196.04kB 37.86%  bufio.NewReaderSize (inline)
+ 6680.06kB 35.15% 73.01%  6680.06kB 35.15%  bufio.NewWriterSize
+ 3586.73kB 18.87% 91.88%  3586.73kB 18.87%  runtime.mallocgc
+  520.04kB  2.74% 94.61%   520.04kB  2.74%  internal/poll.runtime_pollSetDeadline
+  512.01kB  2.69% 97.31%   512.01kB  2.69%  encoding/json/v2.makeString
+  512.01kB  2.69%   100%   512.01kB  2.69%  net/http.(*Server).Serve
+         0     0%   100%  7196.04kB 37.86%  bufio.NewReader
+         0     0%   100%   512.01kB  2.69%  encoding/json.Unmarshal (inline)
+         0     0%   100%   512.01kB  2.69%  encoding/json/v2.Unmarshal
+         0     0%   100%   512.01kB  2.69%  encoding/json/v2.makeSliceArshaler.func3
+         0     0%   100%   512.01kB  2.69%  encoding/json/v2.makeStringArshaler.func2
+         0     0%   100%   512.01kB  2.69%  encoding/json/v2.makeStructArshaler.func3
+         0     0%   100%   512.01kB  2.69%  encoding/json/v2.unmarshalDecode
+         0     0%   100%   512.01kB  2.69%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal
+         0     0%   100%   512.01kB  2.69%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP

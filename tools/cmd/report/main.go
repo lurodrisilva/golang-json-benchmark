@@ -181,6 +181,7 @@ type comparison struct {
 	BaseCV        float64   `json:"baseline_cv"`    // sd/mean across trials
 	CandCV        float64   `json:"candidate_cv"`   //
 	Verdict       string    `json:"verdict"`        // see verdict()
+	PostHoc       string    `json:"posthoc_verdict"` // see applyControls (post-hoc, not pre-registered)
 	Note          string    `json:"note,omitempty"` //
 	control       bool
 }
@@ -438,32 +439,49 @@ func compare(m metric, base, cand []*trial, rng *rand.Rand, resamples int, thres
 
 const verdictControl = "control (shared code)"
 
+// postHocResolutionMs is the post-hoc minimum absolute control difference.
+// Server-Timing values have 1 µs (0.001 ms) resolution, so a control median
+// difference of ≤ 2 µs is indistinguishable from quantization. This rule was
+// added AFTER seeing the authoritative results (user-approved 2026-11-17) and
+// is reported next to, never instead of, the pre-registered verdict.
+const postHocResolutionMs = 0.002
+
 // applyControls: shared-code metrics (read, policy, validate) must not differ
-// between arms. If any control's median differs by ≥ threshold, the cell's
-// environment is not stable enough to attribute differences to the library,
-// so every library verdict that names a winner or a detectable difference is
-// downgraded to inconclusive.
+// between arms. Pre-registered rule: if any control's median differs by ≥
+// threshold, every library verdict that names a winner or a detectable
+// difference is downgraded to inconclusive. Post-hoc rule (PostHoc field):
+// the same, but a control only counts when its absolute median difference
+// also exceeds postHocResolutionMs.
 func applyControls(cs []comparison, threshold float64) {
-	var failed []string
+	var failed, failedPH []string
 	for i := range cs {
 		if !cs[i].control {
 			continue
 		}
 		cs[i].Verdict = verdictControl
+		cs[i].PostHoc = verdictControl
 		if strings.HasSuffix(cs[i].Metric, " med") && cs[i].Reduction != nil && math.Abs(*cs[i].Reduction) >= threshold {
-			failed = append(failed, fmt.Sprintf("%s %+.1f%%", cs[i].Metric, *cs[i].Reduction))
+			d := fmt.Sprintf("%s %+.1f%%", cs[i].Metric, *cs[i].Reduction)
+			failed = append(failed, d)
 			cs[i].Note = "control differs ≥ threshold"
+			if math.Abs(cs[i].AbsDiff) > postHocResolutionMs {
+				failedPH = append(failedPH, d)
+			} else {
+				cs[i].Note += " (within timing resolution: ignored post-hoc)"
+			}
 		}
-	}
-	if len(failed) == 0 {
-		return
 	}
 	for i := range cs {
 		if cs[i].control {
 			continue
 		}
 		v := cs[i].Verdict
-		if strings.HasPrefix(v, "goccy better") || strings.HasPrefix(v, "stdlib better") || strings.HasPrefix(v, "detectable") {
+		names := strings.HasPrefix(v, "goccy better") || strings.HasPrefix(v, "stdlib better") || strings.HasPrefix(v, "detectable")
+		cs[i].PostHoc = v
+		if names && len(failedPH) > 0 {
+			cs[i].PostHoc = "inconclusive (control differs beyond resolution)"
+		}
+		if names && len(failed) > 0 {
 			cs[i].Verdict = "inconclusive (shared-code control differs ≥ threshold)"
 			cs[i].Note = "was: " + v + "; controls: " + strings.Join(failed, ", ")
 		}
