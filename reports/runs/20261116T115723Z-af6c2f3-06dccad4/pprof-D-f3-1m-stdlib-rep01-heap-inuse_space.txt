@@ -1,0 +1,21 @@
+File: stdlib-server
+Type: inuse_space
+Time: 2026-11-16 21:58:13 -03
+Showing nodes accounting for 8694.86kB, 100% of 8694.86kB total
+Showing top 15 nodes out of 49
+      flat  flat%   sum%        cum   cum%
+ 3571.91kB 41.08% 41.08%  3571.91kB 41.08%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+ 1536.42kB 17.67% 58.75%  1536.42kB 17.67%  reflect.mapassign_faststr0
+ 1025.23kB 11.79% 70.54%  1025.23kB 11.79%  runtime.mallocgc
+  513.12kB  5.90% 76.44%   513.12kB  5.90%  internal/poll.runtime_pollSetDeadline
+  512.08kB  5.89% 82.33%   512.08kB  5.89%  reflect.growslice
+  512.05kB  5.89% 88.22%   512.05kB  5.89%  sync.runtime_notifyListWait
+  512.02kB  5.89% 94.11%   512.02kB  5.89%  reflect.makemap
+  512.01kB  5.89%   100%   512.01kB  5.89%  net/http.(*Server).Serve
+         0     0%   100%  2560.52kB 29.45%  encoding/json.Unmarshal (inline)
+         0     0%   100%  2560.52kB 29.45%  encoding/json/v2.Unmarshal
+         0     0%   100%  2048.45kB 23.56%  encoding/json/v2.makeMapArshaler.func3
+         0     0%   100%  2560.52kB 29.45%  encoding/json/v2.makeSliceArshaler.func3
+         0     0%   100%  2560.52kB 29.45%  encoding/json/v2.makeStructArshaler.func3
+         0     0%   100%  2560.52kB 29.45%  encoding/json/v2.unmarshalDecode
+         0     0%   100%  2560.52kB 29.45%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal

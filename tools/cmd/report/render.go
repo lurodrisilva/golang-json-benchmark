@@ -73,13 +73,13 @@ func renderMarkdown(c *reportCtx) string {
 	w("- [A] Baseline is always the stdlib arm of the pair. `reduction %% = (stdlib − goccy) / stdlib × 100` for lower-is-better metrics. For higher-is-better metrics (throughput) the sign is set so that positive always means goccy is better.\n")
 	w("- [L] Hardware: one Apple M3 (4P+4E), with server and k6 sharing the host over loopback. These results are **pilot grade**. See §9.\n\n")
 	w("**Headline comparisons (fixed-rate cells):**\n\n")
-	w("| Cell | Metric | stdlib | goccy | reduction | 95%% CI | verdict |\n|---|---|---:|---:|---:|---|---|\n")
+	w("| Cell | Metric | stdlib | goccy | reduction | 95%% CI | verdict (pre-registered) | post-hoc verdict |\n|---|---|---:|---:|---:|---|---|---|\n")
 	headline := map[string]bool{"HTTP request duration (k6) med": true, "HTTP request duration (k6) p(99)": true,
 		"Decode duration (Unmarshal only) med": true, "CPU time per successful op": true, "Allocated bytes per op": true}
 	for _, cl := range c.Cells {
 		for _, cp := range cl.Compares {
 			if headline[cp.Metric] && cl.Key.Variant == "" && cl.Key.Profile == "none" {
-				w("| %s | %s (%s) | %s | %s | %s | %s | %s |\n", cl.Name, cp.Metric, cp.Unit, med(cp, cp.BaseMedian), med(cp, cp.CandMedian), pct(cp.Reduction), ci(cp), cp.Verdict)
+				w("| %s | %s (%s) | %s | %s | %s | %s | %s | %s |\n", cl.Name, cp.Metric, cp.Unit, med(cp, cp.BaseMedian), med(cp, cp.CandMedian), pct(cp.Reduction), ci(cp), cp.Verdict, cp.PostHoc)
 			}
 		}
 	}
@@ -116,7 +116,7 @@ func renderMarkdown(c *reportCtx) string {
 	}
 
 	w("## 4. Fixed-offered-load results\n\n")
-	w("Every value is the **median of per-trial values**. Per-trial percentiles come from k6 for that trial alone. They are never averaged across trials or stages. P99 is shown only when each trial has ≥%d samples. Read, policy and validate rows run **identical shared code** in both arms. They are **negative controls** and never get a library verdict. If any control median differs by ≥ %.0f%%, the environment is too unstable to attribute differences to the library, and every library verdict in that cell is downgraded to *inconclusive*.\n\n", p99MinSamples, c.Threshold)
+	w("Every value is the **median of per-trial values**. Per-trial percentiles come from k6 for that trial alone. They are never averaged across trials or stages. P99 is shown only when each trial has ≥%d samples. Read, policy and validate rows run **identical shared code** in both arms. They are **negative controls** and never get a library verdict. If any control median differs by ≥ %.0f%%, the environment is too unstable to attribute differences to the library, and every library verdict in that cell is downgraded to *inconclusive*. **Post-hoc column [A]:** this rule was added after the authoritative results were seen, and it is user-approved. It applies the same downgrade, but a control counts only when its absolute median difference also exceeds %.3f ms. Server-Timing has 0.001 ms resolution, so smaller gaps are quantization. Read the pre-registered verdict as primary.\n\n", p99MinSamples, c.Threshold, postHocResolutionMs)
 	for _, cl := range c.Cells {
 		if cl.Key.Workload != "fixed" {
 			continue
@@ -130,10 +130,10 @@ func renderMarkdown(c *reportCtx) string {
 			t := cl.Base[0]
 			w("- [M] window: nominal %s s, wall %s s, drain %s s (per trial; the drain is k6 finishing in-flight requests).\n", f(t.Window["nominal_s"]), f(t.Window["wall_s"]), f(t.Window["drain_s"]))
 		}
-		w("\n| Metric | unit | stdlib (trials) | goccy (trials) | stdlib median | goccy median | Δ abs | reduction | 95%% CI | verdict |\n|---|---|---|---|---:|---:|---:|---:|---|---|\n")
+		w("\n| Metric | unit | stdlib (trials) | goccy (trials) | stdlib median | goccy median | Δ abs | reduction | 95%% CI | verdict (pre-registered) | post-hoc verdict |\n|---|---|---|---|---:|---:|---:|---:|---|---|---|\n")
 		for _, cp := range cl.Compares {
-			w("| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s%s |\n", cp.Metric, cp.Unit, list(cp.Baseline), list(cp.Candidate),
-				med(cp, cp.BaseMedian), med(cp, cp.CandMedian), med(cp, cp.AbsDiff), pct(cp.Reduction), ci(cp), cp.Verdict, note(cp.Note))
+			w("| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s%s | %s |\n", cp.Metric, cp.Unit, list(cp.Baseline), list(cp.Candidate),
+				med(cp, cp.BaseMedian), med(cp, cp.CandMedian), med(cp, cp.AbsDiff), pct(cp.Reduction), ci(cp), cp.Verdict, note(cp.Note), cp.PostHoc)
 		}
 		w("\n")
 		for _, pr := range cl.Profiling {

@@ -125,9 +125,11 @@ func gate(r *TrialResult) {
 	if t := r.K6["transport_errors"]; t > 0 && s.Workload != "ramp" {
 		r.invalid("transport errors/timeouts=%.0f", t)
 	}
-	if s.MaxVUs > 0 && r.K6["vus_max"] >= float64(s.MaxVUs) {
-		r.invalid("k6 VU pool exhausted (vus_max=%.0f)", r.K6["vus_max"])
-	}
+	// VU exhaustion: k6's vus_max is the total across all scenarios (warm-up,
+	// measure, every ramp step each preallocate their own pool), so it cannot
+	// be compared with the per-scenario MaxVUs cap. A scenario that runs out
+	// of VUs emits dropped_iterations, which is what the gates above (fixed)
+	// and the knee rule (ramp, per step) already act on. vus_max is recorded.
 	avg, peak := cores(r.Samples["k6"])
 	r.Host["k6_cpu_avg_cores"], r.Host["k6_cpu_peak_cores"] = avg, peak
 	if avg > gateK6AvgCoresMax || peak > gateK6PeakCoresMax {
@@ -154,7 +156,7 @@ func gate(r *TrialResult) {
 		}
 	}
 	if v := r.Host["idle_cpu_pct_before"]; v > gateIdleBusyFlagPct {
-		r.flag("host busy %.1f%% before trial", v)
+		r.flag("host busy %.1f%% before trial (top: %s)", v, strings.Join(r.HostTopBefore, ", "))
 	}
 	if r.Spec.Profile != "none" {
 		r.flag("profiling active: not a primary latency trial")

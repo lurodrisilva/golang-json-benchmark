@@ -31,9 +31,26 @@ const srvHdl = new Trend('srv_hdl', true);
 const non202 = new Counter('non_202');
 const transportErrors = new Counter('transport_errors');
 
+// VU pools are sized per scenario from its own rate so that a short host
+// stall (pilot [M]: ~100-300 ms bursts at 3-6k rps) is absorbed and shows up
+// as latency instead of dropped_iterations: preallocated >= rate x 0.1 s,
+// max >= rate x 0.3 s, never below PRE_VUS / MAX_VUS. Each VU holds its own
+// copy of the fixture, so the pools are capped by these factors (k6 RSS).
+const PRE_VUS = parseInt(env.PRE_VUS || '50', 10);
+const MAX_VUS = parseInt(env.MAX_VUS || '400', 10);
+// VU pools are sized from each scenario's own rate so that a host-wide stall
+// of `cover` seconds is absorbed by preallocated VUs (mid-test VU init is too
+// slow to help) and shows up as latency rather than dropped_iterations.
+// Pilot/calibration [M]: stalls of 100-425 ms on the M3; 0.1 s of cover
+// still dropped 162 iterations at f2 1000 rps. Fixed trials use 0.5 s.
+// Ramp steps all preallocate at start, so they keep 0.1 s to bound k6 RSS;
+// ramp drops are reported per step and break the knee (documented).
+function pool(rate, cover) {
+  const pre = Math.max(PRE_VUS, Math.ceil(rate * cover));
+  return { preAllocatedVUs: pre, maxVUs: Math.max(MAX_VUS, pre, Math.ceil(rate * cover * 2)) };
+}
+
 function scenarios() {
-  const preVUs = parseInt(env.PRE_VUS || '50', 10);
-  const maxVUs = parseInt(env.MAX_VUS || '400', 10);
   if (WORKLOAD === 'smoke') {
     return { smoke: { executor: 'shared-iterations', vus: 1, iterations: 20, maxDuration: '60s', tags: { phase: 'measure' } } };
   }
@@ -42,10 +59,10 @@ function scenarios() {
     const s = {};
     if (env.WARMUP && env.WARMUP !== '0s') {
       s.warmup = { executor: 'constant-arrival-rate', rate, timeUnit: '1s', duration: env.WARMUP,
-        preAllocatedVUs: preVUs, maxVUs, tags: { phase: 'warmup' } };
+        ...pool(rate, 0.5), tags: { phase: 'warmup' } };
     }
     s.measure = { executor: 'constant-arrival-rate', rate, timeUnit: '1s', duration: env.DURATION,
-      preAllocatedVUs: preVUs, maxVUs, startTime: env.WARMUP || '0s', tags: { phase: 'measure' } };
+      ...pool(rate, 0.5), startTime: env.WARMUP || '0s', tags: { phase: 'measure' } };
     return s;
   }
   if (WORKLOAD === 'ramp') {
@@ -57,9 +74,11 @@ function scenarios() {
     const s = {};
     const secs = parseDur(stepDur);
     pct.forEach((p, i) => {
+      const rate = Math.max(1, Math.round(knee * p / 100));
+      // gracefulStop 5s: limits overlap with the next step's pool.
       s[`step_${String(i).padStart(2, '0')}`] = { executor: 'constant-arrival-rate',
-        rate: Math.max(1, Math.round(knee * p / 100)), timeUnit: '1s', duration: stepDur,
-        preAllocatedVUs: preVUs, maxVUs, startTime: `${i * secs}s`,
+        rate, timeUnit: '1s', duration: stepDur, gracefulStop: '5s',
+        ...pool(rate, 0.1), startTime: `${i * secs}s`,
         tags: { phase: 'measure', step: String(i), step_pct: String(p) } };
     });
     return s;

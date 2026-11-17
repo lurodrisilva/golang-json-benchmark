@@ -34,7 +34,7 @@ func TestGate(t *testing.T) {
 		{"non202 at limit", func(r *TrialResult) { r.K6["non_202"] = 1 }, "valid", ""},
 		{"non202 over", func(r *TrialResult) { r.K6["non_202"] = 2 }, "invalid", "non-202"},
 		{"transport", func(r *TrialResult) { r.K6["transport_errors"] = 1 }, "invalid", "transport"},
-		{"vus exhausted", func(r *TrialResult) { r.K6["vus_max"] = 400 }, "invalid", "VU pool"},
+		{"vus_max is not a per-scenario cap", func(r *TrialResult) { r.K6["vus_max"] = 1200 }, "valid", ""},
 		{"k6 cpu avg", func(r *TrialResult) {
 			r.Samples["k6"] = []Sample{{T: 0}, {T: 5, CPUTime: 20}, {T: 10, CPUTime: 40}} // 4 cores
 		}, "invalid", "load generator CPU"},

@@ -1,0 +1,22 @@
+File: stdlib-server
+Type: inuse_objects
+Time: 2026-11-16 21:58:13 -03
+Showing nodes accounting for 58459, 99.61% of 58690 total
+Dropped 17 nodes (cum <= 293)
+Showing top 15 nodes out of 32
+      flat  flat%   sum%        cum   cum%
+     32768 55.83% 55.83%      32768 55.83%  net/http.(*Server).Serve
+     10923 18.61% 74.44%      10923 18.61%  reflect.makemap
+      5462  9.31% 83.75%       5462  9.31%  reflect.mapassign_faststr0
+      4681  7.98% 91.73%       4681  7.98%  sync.runtime_notifyListWait
+      3277  5.58% 97.31%       3277  5.58%  reflect.growslice
+      1348  2.30% 99.61%       1348  2.30%  runtime.mallocgc
+         0     0% 99.61%      19662 33.50%  encoding/json.Unmarshal (inline)
+         0     0% 99.61%      19662 33.50%  encoding/json/v2.Unmarshal
+         0     0% 99.61%      16385 27.92%  encoding/json/v2.makeMapArshaler.func3
+         0     0% 99.61%      19662 33.50%  encoding/json/v2.makeSliceArshaler.func3
+         0     0% 99.61%      19662 33.50%  encoding/json/v2.makeStructArshaler.func3
+         0     0% 99.61%      19662 33.50%  encoding/json/v2.unmarshalDecode
+         0     0% 99.61%      19662 33.50%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal
+         0     0% 99.61%      19665 33.51%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0% 99.61%      32768 55.83%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run.func4

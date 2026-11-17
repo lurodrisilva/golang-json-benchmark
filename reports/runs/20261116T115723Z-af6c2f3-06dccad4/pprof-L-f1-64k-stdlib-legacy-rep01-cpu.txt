@@ -1,0 +1,28 @@
+File: stdlib-legacy-server
+Type: cpu
+Time: 2026-11-16 19:20:59 -03
+Duration: 60.14s, Total samples = 85.35s (141.91%)
+Showing nodes accounting for 70.10s, 82.13% of 85.35s total
+Dropped 337 nodes (cum <= 0.43s)
+Showing top 20 nodes out of 131
+      flat  flat%   sum%        cum   cum%
+    43.25s 50.67% 50.67%     43.25s 50.67%  syscall.rawsyscalln
+     4.52s  5.30% 55.97%      4.52s  5.30%  runtime.kevent
+     3.08s  3.61% 59.58%      3.49s  4.09%  encoding/json.unquoteBytes
+     2.99s  3.50% 63.08%      3.75s  4.39%  encoding/json.(*decodeState).rescanLiteral
+     1.82s  2.13% 65.21%     27.70s 32.45%  encoding/json.(*decodeState).object
+     1.74s  2.04% 67.25%      1.74s  2.04%  runtime.pthread_kill
+     1.28s  1.50% 68.75%      1.28s  1.50%  runtime.usleep
+     1.23s  1.44% 70.19%      3.46s  4.05%  encoding/json.checkValid
+     1.20s  1.41% 71.60%      1.88s  2.20%  reflect.(*rtype).Name
+     1.15s  1.35% 72.95%      5.35s  6.27%  encoding/json.indirect
+     1.15s  1.35% 74.29%      1.49s  1.75%  encoding/json.stateEndValue
+     1.15s  1.35% 75.64%      1.15s  1.35%  runtime.pthread_cond_wait
+     1.05s  1.23% 76.87%      1.09s  1.28%  encoding/json.stateInString
+     0.90s  1.05% 77.93%      1.10s  1.29%  encoding/json.stateBeginValue
+     0.78s  0.91% 78.84%      1.84s  2.16%  encoding/json.(*decodeState).scanWhile
+     0.73s  0.86% 79.70%      0.73s  0.86%  internal/strconv.readFloat
+     0.60s   0.7% 80.40%     10.11s 11.85%  encoding/json.(*decodeState).literalStore
+     0.53s  0.62% 81.02%      0.53s  0.62%  runtime.memmove
+     0.48s  0.56% 81.58%     27.70s 32.45%  encoding/json.(*decodeState).value
+     0.47s  0.55% 82.13%      0.47s  0.55%  internal/runtime/maps.memHashAES

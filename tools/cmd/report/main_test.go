@@ -120,10 +120,37 @@ func TestKnee(t *testing.T) {
 		{"throughput knee", []step{mk(100, 100, 1, 1000), mk(200, 190, 1, 1000)}, "100 rps"},
 		{"drops", []step{mk(100, 100, 1, 1000), {Offered: 200, Achieved: 200, P95: 1, Count: 1000, Dropped: 1}}, "100 rps"},
 		{"below lowest", []step{mk(100, 50, 1, 1000)}, "below lowest step"},
+		{"censored", []step{mk(100, 100, 1, 1000), mk(200, 200, 1, 1000)}, ">= 200 rps (not reached"},
+		{"single passing step is censored", []step{mk(100, 100, 1, 1000)}, ">= 100 rps (not reached"},
 	}
 	for _, c := range cases {
 		if got := knee(c.ss); !strings.HasPrefix(got, c.want) {
 			t.Errorf("%s: knee=%q want prefix %q", c.name, got, c.want)
 		}
+	}
+}
+
+func TestControlsPostHocResolution(t *testing.T) {
+	p := func(v float64) *float64 { return &v }
+	// 0.009 vs 0.010 ms: -11.1% but a 1 µs gap (quantization).
+	cs := []comparison{
+		{Metric: "Decode med", Verdict: "goccy better (CI excludes 0, ≥ threshold)", Reduction: p(50)},
+		{Metric: "Read med", control: true, Reduction: p(-11.1), AbsDiff: 0.001},
+	}
+	applyControls(cs, 10)
+	if !strings.HasPrefix(cs[0].Verdict, "inconclusive") {
+		t.Fatalf("pre-registered verdict must still downgrade: %q", cs[0].Verdict)
+	}
+	if !strings.HasPrefix(cs[0].PostHoc, "goccy better") {
+		t.Fatalf("post-hoc should ignore sub-resolution control: %q", cs[0].PostHoc)
+	}
+	// A control gap beyond resolution downgrades both.
+	cs = []comparison{
+		{Metric: "Decode med", Verdict: "goccy better", Reduction: p(50)},
+		{Metric: "Policy med", control: true, Reduction: p(-15), AbsDiff: 0.08},
+	}
+	applyControls(cs, 10)
+	if !strings.HasPrefix(cs[0].PostHoc, "inconclusive") || !strings.HasPrefix(cs[0].Verdict, "inconclusive") {
+		t.Fatalf("both verdicts should downgrade: %q / %q", cs[0].Verdict, cs[0].PostHoc)
 	}
 }

@@ -1,0 +1,22 @@
+File: goccy-server
+Type: inuse_objects
+Time: 2026-11-16 22:04:14 -03
+Showing nodes accounting for 49591, 99.48% of 49852 total
+Dropped 13 nodes (cum <= 249)
+Showing top 15 nodes out of 31
+      flat  flat%   sum%        cum   cum%
+     32768 65.73% 65.73%      32768 65.73%  net/http.(*Server).Serve
+      8192 16.43% 82.16%      15736 31.57%  net/http.(*conn).serve
+      7283 14.61% 96.77%       7283 14.61%  reflect.mapassign_faststr0
+      1348  2.70% 99.48%       1348  2.70%  runtime.mallocgc
+         0     0% 99.48%       7287 14.62%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0% 99.48%       7287 14.62%  github.com/goccy/go-json.unmarshal
+         0     0% 99.48%       7283 14.61%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+         0     0% 99.48%       7285 14.61%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+         0     0% 99.48%       7285 14.61%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).decodeLong
+         0     0% 99.48%       7285 14.61%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+         0     0% 99.48%       7287 14.62%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/goccy.Codec.Unmarshal
+         0     0% 99.48%       7288 14.62%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0% 99.48%      32768 65.73%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run.func4
+         0     0% 99.48%       7288 14.62%  net/http.(*ServeMux).ServeHTTP
+         0     0% 99.48%       7288 14.62%  net/http.serverHandler.ServeHTTP
