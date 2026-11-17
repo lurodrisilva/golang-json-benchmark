@@ -174,15 +174,15 @@ type comparison struct {
 	Candidate     []float64 `json:"candidate_trials"`
 	BaseMedian    float64   `json:"baseline_median"`
 	CandMedian    float64   `json:"candidate_median"`
-	AbsDiff       float64   `json:"abs_diff"`       // candidate − baseline
-	Reduction     *float64  `json:"reduction_pct"`  // (stdlib − goccy)/stdlib·100; nil if baseline 0
-	CILow         *float64  `json:"ci95_low_pct"`   // bootstrap
-	CIHigh        *float64  `json:"ci95_high_pct"`  //
-	BaseCV        float64   `json:"baseline_cv"`    // sd/mean across trials
-	CandCV        float64   `json:"candidate_cv"`   //
-	Verdict       string    `json:"verdict"`        // see verdict()
+	AbsDiff       float64   `json:"abs_diff"`        // candidate − baseline
+	Reduction     *float64  `json:"reduction_pct"`   // (stdlib − goccy)/stdlib·100; nil if baseline 0
+	CILow         *float64  `json:"ci95_low_pct"`    // bootstrap
+	CIHigh        *float64  `json:"ci95_high_pct"`   //
+	BaseCV        float64   `json:"baseline_cv"`     // sd/mean across trials
+	CandCV        float64   `json:"candidate_cv"`    //
+	Verdict       string    `json:"verdict"`         // see verdict()
 	PostHoc       string    `json:"posthoc_verdict"` // see applyControls (post-hoc, not pre-registered)
-	Note          string    `json:"note,omitempty"` //
+	Note          string    `json:"note,omitempty"`  //
 	control       bool
 }
 
