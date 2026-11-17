@@ -56,7 +56,10 @@ make run  MATRIX=loadtest/matrix/pilot.json          # P6 pilot (~3 h): ramps to
 ```sh
 make report                         # latest run
 make report RUN=results/<run-id>    # specific run
+make report RUN=results/<decode-run>,results/<encode-run>   # combined report (first run holds the output)
 ```
+
+Encode cells use `"op": "encode"` in the matrix (for example `loadtest/matrix/e2e-encode.json`). benchctl starts both servers with `-encode-fixture` and sets k6 `OP=encode` and `EXPECT_BYTES` (taken from the server manifest). Trials are written to `enc-<load>` directories. The report keys every cell by op and never compares across ops.
 
 Outputs `<run>/report/{report.md,report.html,trials.csv,cells.json,pprof-*.txt}`.
 

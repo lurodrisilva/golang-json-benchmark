@@ -44,6 +44,7 @@ type Cell struct {
 	Reps     int      `json:"reps"`
 	Profile  string   `json:"profile,omitempty"`
 	Variant  string   `json:"variant,omitempty"`
+	Op       string   `json:"op,omitempty"` // "" | decode | encode
 }
 
 func cmdRun(args []string) error {
@@ -171,7 +172,7 @@ func cmdRun(args []string) error {
 			return fmt.Errorf("interrupted after %d/%d trials; partial run kept in %s", i, len(plan), runDir)
 		}
 		s.RunDir, s.BinDir = runDir, bins
-		fmt.Fprintf(os.Stderr, "[%d/%d] %s %s %s rep %d\n", i+1, len(plan), s.Arm, s.Fixture, s.Workload, s.Rep)
+		fmt.Fprintf(os.Stderr, "[%d/%d] %s %s %s%s rep %d\n", i+1, len(plan), s.Arm, s.Fixture, opLabel(s), s.Workload, s.Rep)
 		res, err := runTrial(ctx, s)
 		line := map[string]any{"seq": i + 1, "dir": strings.TrimPrefix(s.dir(), runDir+"/")}
 		if res != nil {
@@ -241,6 +242,13 @@ func order(mx Matrix) ([]TrialSpec, error) {
 		if c.Profile == "" {
 			c.Profile = "none"
 		}
+		switch c.Op {
+		case "", "decode":
+			c.Op = ""
+		case "encode":
+		default:
+			return nil, fmt.Errorf("cell %s/%s: unknown op %q", c.Fixture, c.Workload, c.Op)
+		}
 		first := rng.IntN(2)
 		for rep := 1; rep <= c.Reps; rep++ {
 			pair := []string{c.Pair[first], c.Pair[1-first]}
@@ -252,7 +260,7 @@ func order(mx Matrix) ([]TrialSpec, error) {
 					Duration: c.Duration, Warmup: c.Warmup, Knee: c.Knee, Steps: c.Steps, StepDur: c.StepDur,
 					Rep: rep, Profile: c.Profile, GOMAXPROCS: mx.GOMAXPROCS, PreVUs: or(mx.PreVUs, 50),
 					MaxVUs: or(mx.MaxVUs, 400), Addr: "127.0.0.1:8080", Mgmt: "127.0.0.1:6061", Raw: true,
-					Variant: c.Variant})
+					Variant: c.Variant, Op: c.Op})
 			}
 		}
 	}
@@ -387,6 +395,13 @@ func vcsSetting(goVersionM, key string) string {
 		if len(f) >= 2 && f[0] == "build" && strings.HasPrefix(f[1], key+"=") {
 			return strings.TrimPrefix(f[1], key+"=")
 		}
+	}
+	return ""
+}
+
+func opLabel(s TrialSpec) string {
+	if s.encode() {
+		return "encode "
 	}
 	return ""
 }

@@ -12,14 +12,22 @@ import (
 )
 
 type reportCtx struct {
-	Run                                 string
-	Cells                               []*cell
-	Trials                              []*trial
-	Threshold                           float64
-	Resamples                           int
-	Seed                                uint64
-	Env, Build, Matrix, Fixtures, Bench []byte
-	Conformance                         map[string][]byte
+	Run         string
+	Cells       []*cell
+	Trials      []*trial
+	Threshold   float64
+	Resamples   int
+	Seed        uint64
+	Runs        []runMeta
+	Bench       []byte
+	Conformance map[string][]byte
+}
+
+// runMeta is one benchctl run directory's manifests. A report may combine
+// runs (e.g. the decode run and the later encode run); each keeps its own.
+type runMeta struct {
+	Name, Dir                    string
+	Env, Build, Matrix, Fixtures []byte
 }
 
 func f(v float64) string {
@@ -48,12 +56,9 @@ func pct(p *float64) string {
 func renderMarkdown(c *reportCtx) string {
 	var b strings.Builder
 	w := func(format string, a ...any) { fmt.Fprintf(&b, format, a...) }
-	run := c.Run
-	if i := strings.LastIndex(run, "/"); i >= 0 {
-		run = run[i+1:]
-	}
-	w("# encoding/json vs goccy/go-json: deserialization benchmark report\n\n")
-	w("Run `%s`. This report is generated from the artifacts on disk; it contains no hand-entered numbers.\n\n", run)
+	w("# encoding/json vs goccy/go-json: JSON codec benchmark report (decode and encode)\n\n")
+	w("Run(s) `%s`. This report is generated from the artifacts on disk; it contains no hand-entered numbers.\n\n", c.Run)
+	w("**Comparison rule [A]:** libraries are compared only within the same operation, payload and load test. Decode (POST /ingest, Unmarshal) and encode (GET /batch, Marshal) are separate experiments; no number in this report compares an encode cell with a decode cell.\n\n")
 	w("Tags: **[M]** measured · **[A]** analysis/derived · **[H]** hypothesis · **[L]** limitation.\n\n")
 
 	w("## 1. Executive summary\n\n")
@@ -75,7 +80,7 @@ func renderMarkdown(c *reportCtx) string {
 	w("**Headline comparisons (fixed-rate cells):**\n\n")
 	w("| Cell | Metric | stdlib | goccy | reduction | 95%% CI | verdict (pre-registered) | post-hoc verdict |\n|---|---|---:|---:|---:|---|---|---|\n")
 	headline := map[string]bool{"HTTP request duration (k6) med": true, "HTTP request duration (k6) p(99)": true,
-		"Decode duration (Unmarshal only) med": true, "CPU time per successful op": true, "Allocated bytes per op": true}
+		"Decode duration (Unmarshal only) med": true, "Encode duration (Marshal only) med": true, "CPU time per successful op": true, "Allocated bytes per op": true}
 	for _, cl := range c.Cells {
 		for _, cp := range cl.Compares {
 			if headline[cp.Metric] && cl.Key.Variant == "" && cl.Key.Profile == "none" {
@@ -83,14 +88,22 @@ func renderMarkdown(c *reportCtx) string {
 			}
 		}
 	}
-	w("\n**Conditional recommendation [A]:** you can only adopt goccy/go-json on this evidence if the decode-time and CPU-per-op verdicts above are \"goccy better\" for the payload sizes you actually serve, **and** the correctness matrix (§3) shows no deviation that matters to your inputs. Treat cells marked exploratory, inconclusive or below threshold as \"no justification for the dependency\".\n\n")
+	w("\n**Conditional recommendation [A]:** you can only adopt goccy/go-json on this evidence if the decode-time (or, for response encoding, encode-time) and CPU-per-op verdicts above are \"goccy better\" for the operations and payload sizes you actually serve, **and** the correctness matrix (§3) shows no deviation that matters to your inputs. Treat cells marked exploratory, inconclusive or below threshold as \"no justification for the dependency\".\n\n")
 
 	w("## 2. Environment and reproducibility manifest\n\n")
-	w("Exact build metadata (binaries are preserved under `<run>/bin/`):\n\n")
-	w("```json\n%s\n```\n\n", trimJSON(c.Build, 6000))
-	w("Host and toolchain:\n\n```json\n%s\n```\n\n", trimJSON(c.Env, 6000))
-	w("Fixtures (SHA-256):\n\n```\n%s```\n\n", string(c.Fixtures))
-	w("Matrix:\n\n```json\n%s\n```\n\n", strings.TrimSpace(string(c.Matrix)))
+	for _, rm := range c.Runs {
+		if len(c.Runs) > 1 {
+			w("### Run `%s`\n\n", rm.Name)
+		}
+		w("Exact build metadata (binaries are preserved under `<run>/bin/`):\n\n")
+		w("```json\n%s\n```\n\n", trimJSON(rm.Build, 6000))
+		w("Host and toolchain:\n\n```json\n%s\n```\n\n", trimJSON(rm.Env, 6000))
+		w("Fixtures (SHA-256):\n\n```\n%s```\n\n", string(rm.Fixtures))
+		w("Matrix:\n\n```json\n%s\n```\n\n", strings.TrimSpace(string(rm.Matrix)))
+	}
+	if len(c.Runs) > 1 {
+		w("- [L] The runs were executed at different times on the same host. Compare libraries only within a run's own cells; host state (thermal, background load) may differ between runs.\n\n")
+	}
 
 	w("## 3. Correctness and compatibility\n\n")
 	if len(c.Conformance) == 0 {
@@ -103,10 +116,17 @@ func renderMarkdown(c *reportCtx) string {
 		sort.Strings(names)
 		for _, n := range names {
 			rows := strings.Split(strings.TrimSpace(string(c.Conformance[n])), "\n")
+			// Find the "conforms" column by header: the decode and encode
+			// matrices have different column sets.
+			ci := -1
+			for i, h := range strings.Split(rows[0], "\t") {
+				if h == "conforms" {
+					ci = i
+				}
+			}
 			dev := 0
 			for _, r := range rows[1:] {
-				// columns: goexperiment codec case spec actual value_check conforms error
-				if cols := strings.Split(r, "\t"); len(cols) >= 7 && cols[6] != "true" {
+				if cols := strings.Split(r, "\t"); ci >= 0 && len(cols) > ci && cols[ci] != "true" {
 					dev++
 				}
 			}
@@ -137,9 +157,11 @@ func renderMarkdown(c *reportCtx) string {
 		}
 		w("\n")
 		for _, pr := range cl.Profiling {
-			w("<details><summary>[M] %s rep %d %s profile: %.0f decoded ops in the window</summary>\n\n```\n%s```\n</details>\n\n", pr.Arm, pr.Rep, pr.Kind, pr.DecodedOK, pr.Top)
+			w("<details><summary>[M] %s rep %d %s profile: %.0f successful ops in the window</summary>\n\n```\n%s```\n</details>\n\n", pr.Arm, pr.Rep, pr.Kind, pr.DecodedOK, pr.Top)
 		}
 	}
+
+	w("%s", responseSizes(c))
 
 	w("## 5. Saturation (stepped offered load)\n\n")
 	for _, cl := range c.Cells {
@@ -150,7 +172,11 @@ func renderMarkdown(c *reportCtx) string {
 		labels := sortedKeys(cl.Steps)
 		for _, l := range labels {
 			w("**%s**: knee = %s [A]\n\n", l, cl.Knee[l])
-			w("| step | offered rps | achieved rps | dropped | non-202 | P50 ms | P95 ms | P99 ms | decode P50 ms | samples |\n|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n")
+			fail, codecCol := "non-202", "decode P50 ms"
+			if cl.Key.Op == "encode" {
+				fail, codecCol = "non-200 / bad length", "encode P50 ms"
+			}
+			w("| step | offered rps | achieved rps | dropped | %s | P50 ms | P95 ms | P99 ms | %s | samples |\n|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n", fail, codecCol)
 			for _, s := range cl.Steps[l] {
 				w("| %d | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n", s.Index, f(s.Offered), f(s.Achieved), f(s.Dropped), f(s.Non202), f(s.P50), f(s.P95), stepP99(s), f(s.DecMed), f(s.Count))
 			}
@@ -159,17 +185,28 @@ func renderMarkdown(c *reportCtx) string {
 		for _, e := range cl.Excluded {
 			w("- [M] %s\n", e)
 		}
-		w("- [L] Each step's percentiles come from that step's samples only. The knee follows plan §14.4: the highest step with ≥99%% achieved, no drops, no non-202, and P95 ≤ 3× the first step's P95 (P95 replaces the plan's P99 criterion because low steps of large fixtures cannot reach the 10,000-sample P99 minimum; each step needs ≥%d samples). Step P99 is shown only for steps with ≥%d samples. If any step's k6 CPU limit was hit, the run is marked invalid instead of reading as a knee.\n\n", kneeMinSamples, p99MinSamples)
+		w("- [L] Each step's percentiles come from that step's samples only. The knee follows plan §14.4: the highest step with ≥99%% achieved, no drops, no failed responses (decode: non-202; encode: non-200 or wrong body length), and P95 ≤ 3× the first step's P95 (P95 replaces the plan's P99 criterion because low steps of large fixtures cannot reach the 10,000-sample P99 minimum; each step needs ≥%d samples). Step P99 is shown only for steps with ≥%d samples. If any step's k6 CPU limit was hit, the run is marked invalid instead of reading as a knee.\n\n", kneeMinSamples, p99MinSamples)
 	}
 
-	w("## 6. Decoder microbenchmarks (isolated, not HTTP)\n\n")
+	w("## 6. Codec microbenchmarks (isolated, not HTTP)\n\n")
+	w("Unmarshal and Marshal benchmarks use the same fixtures and model types as the servers. Compare codecs within one benchmark (same operation and fixture) only.\n\n")
 	if len(c.Bench) == 0 {
 		w("- Not supplied (`-bench`). Run `make microbench` (benchstat output).\n\n")
 	} else {
 		w("[M] benchstat output (`go test -bench` with -count≥10). These conclusions are **separate** from the HTTP conclusions:\n\n```\n%s\n```\n\n", strings.TrimSpace(string(c.Bench)))
 	}
 
-	w("## 7. Attribution: decoder vs HTTP, GC, allocation, validation, instrumentation\n\n")
+	hasEncode := false
+	for _, t := range c.Trials {
+		if opOf(t) == "encode" {
+			hasEncode = true
+			break
+		}
+	}
+	w("## 7. Attribution: codec vs HTTP, GC, allocation, validation, instrumentation\n\n")
+	if hasEncode {
+		w("- [A] Encode handler time (`srv_ehdl`) = Marshal + header setup; it ends before the response body is written. The write (`Response write per op`) is shared code and is a negative control. Client time − handler time ≈ response delivery, kernel and k6 receive cost (`http_req_receiving`).\n")
+	}
 	w("- [A] Handler time = read + policy scan + decode + validate (+ timer overhead). Policy and validate are shared code and should match across arms. A difference in them points to GC or scheduler interference, not to the decoder.\n")
 	w("- [A] HTTP time − handler time ≈ network, kernel, and k6 client cost, plus response delivery. The library under test does not touch these.\n")
 	w("- [A] The `variant=minimal` cells (no timestamps, no Server-Timing) bound the instrumentation overhead. Compare their HTTP latency and CPU/op with the matching full-instrumentation cell.\n")
@@ -178,7 +215,7 @@ func renderMarkdown(c *reportCtx) string {
 
 	w("## 8. Generator capacity\n\n| trial | k6 avg cores | k6 peak cores | server avg cores (ps) | speed limit before/after |\n|---|---:|---:|---:|---|\n")
 	for _, t := range c.Trials {
-		w("| %s | %s | %s | %s | %s/%s |\n", relDir(c.Run, t.dir), f(t.Host["k6_cpu_avg_cores"]), f(t.Host["k6_cpu_peak_cores"]), f(t.Host["server_cpu_avg_cores_ps"]), f(t.Host["cpu_speed_limit_before"]), f(t.Host["cpu_speed_limit_after"]))
+		w("| %s | %s | %s | %s | %s/%s |\n", relDir(t.run, t.dir), f(t.Host["k6_cpu_avg_cores"]), f(t.Host["k6_cpu_peak_cores"]), f(t.Host["server_cpu_avg_cores_ps"]), f(t.Host["cpu_speed_limit_before"]), f(t.Host["cpu_speed_limit_after"]))
 	}
 	w("\n## 9. Threats to validity and open questions\n\n")
 	for _, s := range []string{
@@ -192,6 +229,15 @@ func renderMarkdown(c *reportCtx) string {
 		"[L] Both stdlib arms are reported. The default go1.27 encoding/json is backed by the v2 implementation; Pair L uses GOEXPERIMENT=nojsonv2. The two pairs must not be mixed.",
 	} {
 		w("- %s\n", s)
+	}
+	if hasEncode {
+		for _, s := range []string{
+			"[L] Encode cells serve one fixed, pre-decoded value from memory; real handlers would build the value per request. Encode results measure Marshal + response delivery only.",
+			"[L] Encode responses travel server→k6, so k6 receive cost (`http_req_receiving`) is part of HTTP latency and grows with payload size; it is identical work for both arms only when the response sizes are identical (see the response-size table).",
+			"[L] Pair L (GOEXPERIMENT=nojsonv2) has no encode cells by decision A3.",
+		} {
+			w("- %s\n", s)
+		}
 	}
 	return b.String()
 }
@@ -232,6 +278,58 @@ func sortedKeys[V any](m map[string]V) []string {
 
 func relDir(run, dir string) string {
 	return strings.TrimPrefix(strings.TrimPrefix(dir, run), "/trials/")
+}
+
+// responseSizes renders encoded body bytes per fixture and arm (plan A2:
+// sizes are measured and compared, never normalized).
+func responseSizes(c *reportCtx) string {
+	type k struct{ fx, arm string }
+	got := map[k]map[float64]bool{}
+	var fxs []string
+	seen := map[string]bool{}
+	for _, t := range c.Trials {
+		if opOf(t) != "encode" {
+			continue
+		}
+		key := k{t.Spec.Fixture, t.Spec.Arm}
+		if got[key] == nil {
+			got[key] = map[float64]bool{}
+		}
+		got[key][t.Server["encode_bytes"]] = true
+		if !seen[t.Spec.Fixture] {
+			seen[t.Spec.Fixture] = true
+			fxs = append(fxs, t.Spec.Fixture)
+		}
+	}
+	if len(fxs) == 0 {
+		return ""
+	}
+	sort.Strings(fxs)
+	// one returns the single size seen across trials; NaN if none or several.
+	one := func(m map[float64]bool) (float64, bool) {
+		if len(m) != 1 {
+			return math.NaN(), false
+		}
+		for v := range m {
+			return v, true
+		}
+		return math.NaN(), false
+	}
+	var b strings.Builder
+	b.WriteString("### Response body size (encode)\n\n")
+	b.WriteString("[M] Bytes each server reported for its encoded fixture value (`/manifest` encode_bytes; k6 checks every response against it). Sizes are compared, not normalized: a library that emits fewer bytes gets the benefit in transfer time.\n\n")
+	b.WriteString("| fixture | stdlib bytes | goccy bytes | Δ bytes (stdlib − goccy) | identical size |\n|---|---:|---:|---:|---|\n")
+	for _, fx := range fxs {
+		s, okS := one(got[k{fx, "stdlib"}])
+		g, okG := one(got[k{fx, "goccy"}])
+		same := "n/a"
+		if okS && okG {
+			same = fmt.Sprint(s == g)
+		}
+		fmt.Fprintf(&b, "| %s | %s | %s | %s | %s |\n", fx, f(s), f(g), f(s-g), same)
+	}
+	b.WriteString("\nByte-for-byte equality of the outputs is checked by `TestEncodeRoundTrip` (see `make conformance`).\n\n")
+	return b.String()
 }
 
 func trimJSON(b []byte, n int) string {
@@ -306,7 +404,7 @@ func writeCSV(path string, ts []*trial) error {
 func renderHTML(c *reportCtx, md string) string {
 	var b strings.Builder
 	b.WriteString(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JSON Decode Benchmark</title><style>
+<title>JSON Codec Benchmark</title><style>
 :root{--bg:#fff;--fg:#1b1f24;--muted:#5b6470;--line:#d8dde3;--a:#2f6db5;--b:#c8572f;--code:#f4f6f8}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14171b;--fg:#e6e9ed;--muted:#9aa4b0;--line:#2c333b;--a:#6ea8ec;--b:#f08a5d;--code:#1d2228}}
 :root[data-theme=dark]{--bg:#14171b;--fg:#e6e9ed;--muted:#9aa4b0;--line:#2c333b;--a:#6ea8ec;--b:#f08a5d;--code:#1d2228}

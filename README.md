@@ -1,16 +1,18 @@
 # golang-json-encoding-benchmark
 
-A reproducible comparison of HTTP request **deserialization** performance between Go's `encoding/json` and [`github.com/goccy/go-json`](https://github.com/goccy/go-json).
+A reproducible comparison of HTTP request **deserialization** (decode, `POST /ingest`) and response **serialization** (encode, `GET /batch`) performance between Go's `encoding/json` and [`github.com/goccy/go-json`](https://github.com/goccy/go-json).
 
-**Status:** the harness is implemented and the correctness suite passes. **No benchmark results have been published yet.** The pilot calibration (P6) and the authoritative run (P9, about 18–19 h) are pending approval. See [`docs/plan/implementation-plan.md`](docs/plan/implementation-plan.md).
+**Status:** decode results from run `20261116T115723Z-af6c2f3-06dccad4` are published under [`reports/runs/`](reports/runs/) (pilot-grade, single Apple M3 host). The encode extension ([`docs/plan/encode-plan.md`](docs/plan/encode-plan.md), ADR 0004) is implemented. Its pilot and authoritative run are pending approval, and **no encode results exist yet**.
 
 ## What is compared
 Two separately built `net/http` servers, `stdlib-server` and `goccy-server`, run identical code apart from one `codec.Unmarshal` call. They expose `POST /ingest`, read the body into a bounded buffer, apply a shared strict-input policy, decode it into a fresh typed `IngestBatch`, validate it, and return `202` with an empty body. Under go1.27 the default `encoding/json` is v2-backed, so a second pair built with `GOEXPERIMENT=nojsonv2` is reported separately (ADR 0002).
 
+For encode, started with `-encode-fixture`, each binary also serves `GET /batch`. It `Marshal`s a shared, digest-checked fixture value and writes it with an exact `Content-Length`. Libraries are compared only within the same operation, fixture and workload, never encode against decode.
+
 ## Quick start
 ```sh
 make vet test race conformance   # correctness first (both GOEXPERIMENT settings)
-make microbench                  # decoder-only ns/op, B/op, allocs/op + benchstat
+make microbench                  # codec-only (Unmarshal + Marshal) ns/op, B/op, allocs/op + benchstat
 make smoke                       # ~11 min end-to-end harness check (not a result)
 make run MATRIX=loadtest/matrix/pilot.json && make report
 ```

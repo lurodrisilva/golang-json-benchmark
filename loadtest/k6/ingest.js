@@ -1,9 +1,12 @@
-// k6 load script for POST /ingest. Identical for every implementation; the
-// target is selected only by BASE_URL. All parameters come from env vars set
+// k6 load script for POST /ingest (OP=decode) and GET /batch (OP=encode).
+// Identical for every implementation; the target is selected only by BASE_URL. All parameters come from env vars set
 // by benchctl, and every run records them in its trial manifest.
 //
+//   OP         decode (default) | encode
 //   WORKLOAD   smoke | fixed | ramp          (W0 | W1 | W2)
-//   FIXTURE    path to fixture JSON (binary-loaded once, shared read-only)
+//   FIXTURE    decode: path to fixture JSON (binary-loaded once, shared read-only)
+//   EXPECT_BYTES encode: exact response Content-Length; anything else counts
+//              as bad_length (the server encodes a digest-checked fixture value)
 //   BASE_URL   e.g. http://127.0.0.1:8080
 //   RATE       fixed: requests/s (constant-arrival-rate)
 //   DURATION   fixed: measured duration, e.g. 10m
@@ -21,14 +24,23 @@ import { Trend, Counter } from 'k6/metrics';
 const env = __ENV;
 const WORKLOAD = env.WORKLOAD || 'smoke';
 const BASE_URL = env.BASE_URL || 'http://127.0.0.1:8080';
-const body = open(env.FIXTURE, 'b');
+const OP = env.OP || 'decode';
+if (OP !== 'decode' && OP !== 'encode') throw new Error(`unknown OP ${OP}`);
+// encode never sends a body, so it does not load (and copy per VU) the fixture.
+const body = OP === 'decode' ? open(env.FIXTURE, 'b') : null;
+const EXPECT_BYTES = parseInt(env.EXPECT_BYTES || '0', 10);
+if (OP === 'encode' && !(EXPECT_BYTES > 0)) throw new Error('OP=encode needs EXPECT_BYTES');
 
 const srvRead = new Trend('srv_read', true);
 const srvPol = new Trend('srv_pol', true);
 const srvDec = new Trend('srv_dec', true);
 const srvVal = new Trend('srv_val', true);
 const srvHdl = new Trend('srv_hdl', true);
-const non202 = new Counter('non_202');
+const non202 = new Counter('non_202'); // decode: status != 202
+const non200 = new Counter('non_200'); // encode: status != 200
+const badLength = new Counter('bad_length'); // encode: 200 with wrong length
+const srvEnc = new Trend('srv_enc', true);
+const srvEhdl = new Trend('srv_ehdl', true);
 const transportErrors = new Counter('transport_errors');
 
 // VU pools are sized per scenario from its own rate so that a short host
@@ -100,8 +112,12 @@ const SCEN = scenarios();
 function submetrics() {
   const t = {};
   const always = { trend: ['max>=0'], counter: ['count>=0'] };
-  const trends = ['http_req_duration', 'srv_read', 'srv_pol', 'srv_dec', 'srv_val', 'srv_hdl'];
-  const counters = ['http_reqs', 'non_202', 'transport_errors'];
+  const trends = OP === 'decode'
+    ? ['http_req_duration', 'srv_read', 'srv_pol', 'srv_dec', 'srv_val', 'srv_hdl']
+    : ['http_req_duration', 'http_req_waiting', 'http_req_receiving', 'srv_enc', 'srv_ehdl'];
+  const counters = OP === 'decode'
+    ? ['http_reqs', 'non_202', 'transport_errors']
+    : ['http_reqs', 'non_200', 'bad_length', 'transport_errors', 'data_received'];
   const sels = ['phase:measure'];
   for (const name of Object.keys(SCEN)) {
     if (name.startsWith('step_')) sels.push(`step:${parseInt(name.slice(5), 10)}`);
@@ -122,9 +138,39 @@ export const options = {
 };
 
 const params = { headers: { 'Content-Type': 'application/json' }, timeout: '30s' };
+const getParams = { timeout: '30s' };
 const ST = /(\w+);dur=([0-9.]+)/g;
 
+function serverTiming(res) {
+  const st = res.headers['Server-Timing'];
+  const out = [];
+  if (st) {
+    let m;
+    ST.lastIndex = 0;
+    while ((m = ST.exec(st)) !== null) out.push([m[1], parseFloat(m[2])]);
+  }
+  return out;
+}
+
+// GET /batch: the body is read off the wire in full (http_req_receiving) and
+// then discarded; its size is checked against the header and EXPECT_BYTES.
+function encode() {
+  const res = http.get(`${BASE_URL}/batch`, getParams);
+  if (res.status !== 200) {
+    non200.add(1);
+    if (res.status === 0) transportErrors.add(1);
+  } else if (parseInt(res.headers['Content-Length'] || '-1', 10) !== EXPECT_BYTES) {
+    badLength.add(1);
+  }
+  check(res, { 'status 200': (r) => r.status === 200 });
+  for (const [k, v] of serverTiming(res)) {
+    if (k === 'enc') srvEnc.add(v);
+    else if (k === 'ehdl') srvEhdl.add(v);
+  }
+}
+
 export default function () {
+  if (OP === 'encode') return encode();
   const res = http.post(`${BASE_URL}/ingest`, body, params);
   if (res.status !== 202) {
     non202.add(1);

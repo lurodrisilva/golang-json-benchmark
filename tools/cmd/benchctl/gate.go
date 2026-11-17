@@ -47,6 +47,14 @@ func readK6Summary(r *TrialResult, path string, s TrialSpec) error {
 	sel := "{phase:measure}"
 	r.K6["reqs"] = get("http_reqs"+sel, "count")
 	r.K6["non_202"] = get("non_202"+sel, "count")
+	if s.encode() {
+		// "non_202" is the generic failed-response counter: for encode it is
+		// status != 200 plus 200s whose length differs from encode_bytes.
+		r.K6["non_200"] = get("non_200"+sel, "count")
+		r.K6["bad_length"] = get("bad_length"+sel, "count")
+		r.K6["non_202"] = r.K6["non_200"] + r.K6["bad_length"]
+		r.K6["data_received"] = get("data_received"+sel, "count")
+	}
 	r.K6["transport_errors"] = get("transport_errors"+sel, "count")
 	r.K6["dropped_iterations"] = get("dropped_iterations{scenario:measure}", "count")
 	if s.Workload == "ramp" {
@@ -58,7 +66,11 @@ func readK6Summary(r *TrialResult, path string, s TrialSpec) error {
 			}
 		}
 	}
-	for _, t := range []string{"http_req_duration", "srv_read", "srv_pol", "srv_dec", "srv_val", "srv_hdl"} {
+	trends := []string{"http_req_duration", "srv_read", "srv_pol", "srv_dec", "srv_val", "srv_hdl"}
+	if s.encode() {
+		trends = []string{"http_req_duration", "http_req_waiting", "http_req_receiving", "srv_enc", "srv_ehdl"}
+	}
+	for _, t := range trends {
 		for _, f := range []string{"count", "min", "med", "avg", "p(90)", "p(95)", "p(99)", "max"} {
 			if v := get(t+sel, f); v != 0 || f == "min" {
 				r.K6[t+"."+f] = v
@@ -69,7 +81,9 @@ func readK6Summary(r *TrialResult, path string, s TrialSpec) error {
 		names := make([]string, 0)
 		for name := range doc.Metrics {
 			if strings.HasPrefix(name, "http_reqs{step:") || strings.HasPrefix(name, "http_req_duration{step:") ||
-				strings.HasPrefix(name, "srv_dec{step:") || strings.HasPrefix(name, "non_202{step:") {
+				strings.HasPrefix(name, "srv_dec{step:") || strings.HasPrefix(name, "non_202{step:") ||
+				strings.HasPrefix(name, "srv_enc{step:") || strings.HasPrefix(name, "non_200{step:") ||
+				strings.HasPrefix(name, "bad_length{step:") {
 				names = append(names, name)
 			}
 		}

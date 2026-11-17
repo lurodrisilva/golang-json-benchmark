@@ -18,3 +18,7 @@ func now() time.Time { return time.Time{} }
 
 func recordTimings(*metrics.Set, http.ResponseWriter, time.Time, time.Time, time.Time, time.Time, time.Time) {
 }
+
+func recordEncTimings(*metrics.Set, http.ResponseWriter, time.Time, time.Time, time.Time) {}
+
+func recordWrite(*metrics.Set, time.Time) {}

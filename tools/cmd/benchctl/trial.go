@@ -40,7 +40,19 @@ type TrialSpec struct {
 	Addr       string `json:"addr"`
 	Mgmt       string `json:"mgmt"`
 	Raw        bool   `json:"raw_samples"`
-	Variant    string `json:"variant"` // "" | minimal (instrumentation control)
+	Variant    string `json:"variant"`      // "" | minimal (instrumentation control)
+	Op         string `json:"op,omitempty"` // "" or decode (POST /ingest) | encode (GET /batch)
+}
+
+func (s TrialSpec) encode() bool { return s.Op == "encode" }
+
+// okKey is the server counter that defines one successful application
+// operation for this trial's op (see docs/metrics.md).
+func (s TrialSpec) okKey() string {
+	if s.encode() {
+		return "enc_ok"
+	}
+	return "decoded_ok"
 }
 
 func (s TrialSpec) dir() string {
@@ -57,6 +69,9 @@ func (s TrialSpec) dir() string {
 	}
 	if s.Profile != "none" {
 		load += "-prof-" + s.Profile
+	}
+	if s.encode() {
+		load = "enc-" + load // decode paths stay unchanged for existing runs
 	}
 	return filepath.Join(s.RunDir, "trials", arm, s.Fixture, load, fmt.Sprintf("rep-%02d", s.Rep))
 }
@@ -92,7 +107,14 @@ func cmdTrial(args []string) error {
 	fs.StringVar(&s.Mgmt, "mgmt", "127.0.0.1:6061", "server management address")
 	fs.BoolVar(&s.Raw, "raw", true, "keep gzipped raw k6 samples (needed for pooled percentiles)")
 	fs.StringVar(&s.Variant, "variant", "", "binary variant suffix, e.g. minimal")
+	fs.StringVar(&s.Op, "op", "decode", "decode (POST /ingest) | encode (GET /batch)")
 	fs.Parse(args)
+	if s.Op == "decode" {
+		s.Op = ""
+	}
+	if s.Op != "" && s.Op != "encode" {
+		return fmt.Errorf("unknown -op %q", s.Op)
+	}
 	if s.RunDir == "" || s.Arm == "" {
 		return errors.New("-run-dir and -arm are required")
 	}
@@ -195,7 +217,11 @@ func runTrial(ctx context.Context, s TrialSpec) (*TrialResult, error) {
 		return finish(err)
 	}
 	defer srvLog.Close()
-	srv := exec.Command(s.binary(), "-addr", s.Addr, "-mgmt-addr", s.Mgmt)
+	srvArgs := []string{"-addr", s.Addr, "-mgmt-addr", s.Mgmt}
+	if s.encode() {
+		srvArgs = append(srvArgs, "-encode-fixture", fixturePath)
+	}
+	srv := exec.Command(s.binary(), srvArgs...)
 	srv.Env = serverEnv(s.GOMAXPROCS)
 	srv.Stdout, srv.Stderr = srvOut, srvLog
 	if err := srv.Start(); err != nil {
@@ -216,15 +242,27 @@ func runTrial(ctx context.Context, s TrialSpec) (*TrialResult, error) {
 		killServer()
 		return finish(err)
 	}
-	if b, _, err := httpGet("http://"+s.Mgmt+"/manifest", 5*time.Second); err == nil {
-		os.WriteFile(filepath.Join(dir, "server-manifest.json"), b, 0o644)
+	manifestBody, _, merr := httpGet("http://"+s.Mgmt+"/manifest", 5*time.Second)
+	if merr == nil {
+		os.WriteFile(filepath.Join(dir, "server-manifest.json"), manifestBody, 0o644)
+	}
+	op, expectBytes := "decode", 0
+	if s.encode() {
+		op = "encode"
+		expectBytes = manifestInt(manifestBody, "encode_bytes")
+		if expectBytes <= 0 {
+			killServer()
+			return finish(fmt.Errorf("encode: server manifest has no encode_bytes (manifest err=%v)", merr))
+		}
+		res.Server["encode_bytes"] = float64(expectBytes)
 	}
 
 	// --- k6 ---
 	k6Args := []string{"run", "-q", "--no-color",
 		"--summary-export", filepath.Join(dir, "k6-summary.json"),
 		"--tag", "impl=" + s.Arm, "--tag", "fixture=" + s.Fixture, "--tag", "workload=" + s.Workload,
-		"--tag", "rep=" + strconv.Itoa(s.Rep), "--tag", "profile=" + s.Profile,
+		"--tag", "rep=" + strconv.Itoa(s.Rep), "--tag", "profile=" + s.Profile, "--tag", "op=" + op,
+		"-e", "OP=" + op, "-e", "EXPECT_BYTES=" + strconv.Itoa(expectBytes),
 		"-e", "WORKLOAD=" + s.Workload, "-e", "FIXTURE=" + fixturePath, "-e", "BASE_URL=http://" + s.Addr,
 		"-e", "RATE=" + strconv.Itoa(s.Rate), "-e", "DURATION=" + s.Duration, "-e", "WARMUP=" + s.Warmup,
 		"-e", "KNEE=" + strconv.Itoa(s.Knee), "-e", "STEPS=" + s.Steps, "-e", "STEP_DUR=" + s.StepDur,
@@ -314,11 +352,11 @@ func runTrial(ctx context.Context, s TrialSpec) (*TrialResult, error) {
 	if swap0 >= 0 {
 		res.Host["swapouts_delta"] = float64(swapouts() - swap0)
 	}
-	deltas(res, m0, m1)
+	deltas(res, s, m0, m1)
 	if err := readK6Summary(res, filepath.Join(dir, "k6-summary.json"), s); err != nil {
 		return finish(err)
 	}
-	finalCounts(res, filepath.Join(dir, "server-final-metrics.json"))
+	finalCounts(res, s, filepath.Join(dir, "server-final-metrics.json"))
 	gate(res)
 	return finish(nil)
 }
@@ -381,7 +419,7 @@ func collectProfile(ctx context.Context, s TrialSpec, dir string, offset float64
 		return nil, err
 	}
 	return []ProfileWindow{{Kind: s.Profile, File: f, Seconds: secs, StartOffset: offset,
-		DecodedOK: num(z, "decoded_ok") - num(a, "decoded_ok")}}, nil
+		DecodedOK: num(z, s.okKey()) - num(a, s.okKey())}}, nil
 }
 
 func num(m map[string]any, k string) float64 {
@@ -396,12 +434,17 @@ func num(m map[string]any, k string) float64 {
 }
 
 // deltas computes window deltas from the two in-process snapshots.
-func deltas(r *TrialResult, a, b map[string]any) {
+// For op=encode the per-op normalizations use enc_ok; the field names
+// (decoded_ok_per_s etc.) keep their historical names and are documented as
+// "successful ops of this trial's op" in docs/metrics.md.
+func deltas(r *TrialResult, s TrialSpec, a, b map[string]any) {
 	keys := []string{"received", "decoded_ok", "decode_errors", "validation_failures", "policy_rejects_utf8",
 		"policy_rejects_dupkey", "rejected_method", "rejected_ctype", "rejected_size", "read_errors", "responded",
 		"sum_read_ns", "sum_policy_ns", "sum_decode_ns", "sum_validate_ns", "sum_handler_ns",
 		"rusage_utime_ns", "rusage_stime_ns", "rusage_nvcsw", "rusage_nivcsw",
-		"rt/gc/heap/allocs:bytes", "rt/gc/heap/allocs:objects", "rt/gc/heap/frees:objects", "rt/gc/cycles/total:gc-cycles"}
+		"rt/gc/heap/allocs:bytes", "rt/gc/heap/allocs:objects", "rt/gc/heap/frees:objects", "rt/gc/cycles/total:gc-cycles",
+		"enc_requests", "enc_ok", "enc_errors", "enc_write_errors", "enc_rejected_method", "enc_resp_bytes",
+		"sum_encode_ns", "sum_enc_handler_ns", "sum_write_ns"}
 	for _, k := range keys {
 		r.Server["d_"+k] = num(b, k) - num(a, k)
 	}
@@ -414,9 +457,10 @@ func deltas(r *TrialResult, a, b map[string]any) {
 	r.Server["cpu_seconds"] = cpu
 	if w := r.Window.WallSeconds; w > 0 {
 		r.Server["cpu_util_cores"] = cpu / w
-		r.Server["decoded_ok_per_s"] = r.Server["d_decoded_ok"] / w
+		r.Server["decoded_ok_per_s"] = r.Server["d_"+s.okKey()] / w
 	}
-	if ok := r.Server["d_decoded_ok"]; ok > 0 {
+	r.Server["d_ops_ok"] = r.Server["d_"+s.okKey()]
+	if ok := r.Server["d_ops_ok"]; ok > 0 {
 		r.Server["cpu_us_per_op"] = cpu * 1e6 / ok
 		r.Server["alloc_bytes_per_op"] = r.Server["d_rt/gc/heap/allocs:bytes"] / ok
 		r.Server["alloc_objects_per_op"] = r.Server["d_rt/gc/heap/allocs:objects"] / ok
@@ -462,7 +506,7 @@ func histCount(m map[string]any, k string) float64 {
 	return s
 }
 
-func finalCounts(r *TrialResult, path string) {
+func finalCounts(r *TrialResult, s TrialSpec, path string) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return
@@ -470,7 +514,10 @@ func finalCounts(r *TrialResult, path string) {
 	var m map[string]any
 	if json.Unmarshal(b, &m) == nil {
 		r.Server["final_received"] = num(m, "received")
-		r.Server["final_decoded_ok"] = num(m, "decoded_ok")
+		if s.encode() {
+			r.Server["final_received"] = num(m, "enc_requests")
+		}
+		r.Server["final_decoded_ok"] = num(m, s.okKey())
 		r.Server["final_responded"] = num(m, "responded")
 	}
 }
@@ -504,4 +551,16 @@ func hostBusyPct() (float64, []string) {
 		top = append(top, fmt.Sprintf("%s %.0f%%", ps[i].name, ps[i].cpu))
 	}
 	return s / float64(runtime.NumCPU()), top
+}
+
+// manifestInt reads an integer "key\tvalue" line from the server manifest.
+func manifestInt(manifest []byte, key string) int {
+	for _, line := range strings.Split(string(manifest), "\n") {
+		k, v, ok := strings.Cut(line, "\t")
+		if ok && k == key {
+			n, _ := strconv.Atoi(strings.TrimSpace(v))
+			return n
+		}
+	}
+	return 0
 }
