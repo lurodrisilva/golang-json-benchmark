@@ -132,6 +132,30 @@ Reading the numbers:
 - goccy cleared a multi-year backlog in one recent burst after a long quiet period. It is too early to tell whether that pace will last.
 - Issue counts are not quality measures. `golang/go` has a dedicated triage process, and many of its closures are duplicates or declined proposals.
 
+## Known users of `goccy/go-json`
+
+The projects below import [`github.com/goccy/go-json`](https://pkg.go.dev/github.com/goccy/go-json?tab=importedby) in public source code. That shows the library is used in those specific projects, not that the organisation has adopted it everywhere. Each reference was checked on 2026-11-18. `encoding/json` ships with Go, so it isn't listed: every Go program can use it without adding a dependency.
+
+### Direct use
+| Organisation | What uses it | Reference |
+|---|---|---|
+| **Apache Software Foundation** | Apache Arrow Go uses it as the default backend of its internal JSON package (v18.8.0). Builds with TinyGo or the `arrow_json_stdlib` tag use `encoding/json` instead. | [arrow-go `internal/json/json.go` @ v18.8.0](https://github.com/apache/arrow-go/blob/v18.8.0/internal/json/json.go) |
+| **OpenTelemetry** | The Collector Contrib OTTL `ParseJSON` function calls its `Unmarshal`. | [`func_parse_json.go` @ pkg/ottl/v1.4.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/pkg/ottl/v1.4.0/pkg/ottl/ottlfuncs/func_parse_json.go) |
+| **Kong** | The Kubernetes Ingress Controller uses it to serialise gateway configuration and custom entities. | [`deckgen.go`](https://github.com/Kong/kubernetes-ingress-controller/blob/main/internal/dataplane/deckgen/deckgen.go) |
+| **Flashbots** | The MEV-Boost Relay API server imports it. Flashbots runs a public deployment of that relay. | [`services/api/service.go`](https://github.com/flashbots/mev-boost-relay/blob/main/services/api/service.go), [README](https://github.com/flashbots/mev-boost-relay) |
+| **ByteDance** | The Arishem rule engine's `tools` package imports it. Its README says Arishem serves dozens of rule-evaluation scenarios on ByteDance's customer service platform. | [package imports](https://pkg.go.dev/github.com/bytedance/arishem/tools?tab=imports), [README](https://github.com/bytedance/arishem) |
+| **Elastic** | The Beats encoding extension in Elastic's OpenTelemetry Collector components imports it. | [package imports](https://pkg.go.dev/github.com/elastic/opentelemetry-collector-components/extension/beatsencodingextension?tab=imports) |
+| **CloudQuery** | The `types` package of its Go Plugin SDK v4 imports it. | [package imports](https://pkg.go.dev/github.com/cloudquery/plugin-sdk/v4/types?tab=imports) |
+| **Solana Foundation** | The root package of its Solana Go SDK v2 imports it. | [package imports](https://pkg.go.dev/github.com/solana-foundation/solana-go/v2?tab=imports) |
+
+### Opt-in, past and indirect use
+- **Datadog:** the official Go API client can use it through the `goccy_gojson` build tag, but defaults to `encoding/json` ([client README](https://github.com/DataDog/datadog-api-client-go#encoderdecoder)).
+- **Fiber:** the docs show how to configure it as an alternative encoder, but the framework defaults to `encoding/json` ([performance guide](https://docs.gofiber.io/guide/faster-fiber/)).
+- **Cloudflare:** the Go SDK imported it directly in v0.116.0. It is absent from the v7.14.0 `go.mod` ([v0.116.0 source](https://github.com/cloudflare/cloudflare-go/blob/v0.116.0/cloudflare.go), [v7.14.0 `go.mod`](https://github.com/cloudflare/cloudflare-go/blob/v7.14.0/go.mod)).
+- **Grafana:** its `go.mod` lists it (v0.10.2) as `// indirect`. A contributor explained that it arrived through Apache Arrow, and Grafana did not use Arrow's JSON encoding or decoding at the time ([`go.mod`](https://github.com/grafana/grafana/blob/49c756d774830375eac37a1df6237e9f9b809c34/go.mod), [discussion](https://github.com/goccy/go-json/issues/490)).
+
+Grafana's pinned v0.10.2 is in the range affected by the advisory in [Security and maintenance](#security-and-maintenance). The other projects' versions were not checked.
+
 ## Quick start
 ```sh
 make vet test race conformance   # correctness first (both GOEXPERIMENT settings)
