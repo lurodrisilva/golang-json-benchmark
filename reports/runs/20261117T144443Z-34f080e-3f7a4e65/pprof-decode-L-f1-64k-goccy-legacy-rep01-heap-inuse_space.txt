@@ -1,0 +1,21 @@
+File: goccy-legacy-server
+Type: inuse_space
+Time: 2026-11-16 19:30:01 -03
+Showing nodes accounting for 9827.27kB, 100% of 9827.27kB total
+Showing top 15 nodes out of 33
+      flat  flat%   sum%        cum   cum%
+ 3084.01kB 31.38% 31.38%  3084.01kB 31.38%  bufio.NewReaderSize (inline)
+ 3084.01kB 31.38% 62.76%  3084.01kB 31.38%  bufio.NewWriterSize (inline)
+ 2049.52kB 20.86% 83.62%  2049.52kB 20.86%  runtime.mallocgc
+  548.84kB  5.58% 89.20%   548.84kB  5.58%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).SetInput (inline)
+  548.84kB  5.58% 94.79%   548.84kB  5.58%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+  512.04kB  5.21%   100%   512.04kB  5.21%  context.withCancel (inline)
+         0     0%   100%  3084.01kB 31.38%  bufio.NewReader (inline)
+         0     0%   100%   512.04kB  5.21%  context.WithCancel
+         0     0%   100%   548.84kB  5.58%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0%   100%   548.84kB  5.58%  github.com/goccy/go-json.unmarshal
+         0     0%   100%   548.84kB  5.58%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/goccy.Codec.Unmarshal
+         0     0%   100%  1097.69kB 11.17%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0%   100%  1097.69kB 11.17%  net/http.(*ServeMux).ServeHTTP
+         0     0%   100%  7777.75kB 79.14%  net/http.(*conn).serve
+         0     0%   100%  3084.01kB 31.38%  net/http.newBufioReader

@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: alloc_space
+Time: 2026-11-17 17:33:14 -03
+Duration: 60s, Total samples = 33242.48MB 
+Showing nodes accounting for 32843.16MB, 98.80% of 33242.48MB total
+Dropped 82 nodes (cum <= 166.21MB)
+Showing top 20 nodes out of 23
+      flat  flat%   sum%        cum   cum%
+26850.36MB 80.77% 80.77% 26850.36MB 80.77%  bytes.Clone (inline)
+ 5189.58MB 15.61% 96.38%  5189.58MB 15.61%  reflect.unsafe_New
+  193.05MB  0.58% 96.96%   193.05MB  0.58%  net/textproto.readMIMEHeader
+  191.55MB  0.58% 97.54%   191.55MB  0.58%  net/http.Header.Clone (inline)
+  167.55MB   0.5% 98.04% 32610.43MB 98.10%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*encodeHandler).ServeHTTP
+  125.54MB  0.38% 98.42%   400.60MB  1.21%  net/http.readRequestLimit
+  124.02MB  0.37% 98.79%   569.16MB  1.71%  net/http.(*conn).readRequest
+       1MB 0.003% 98.80%  5381.97MB 16.19%  encoding/json/v2.makeStructArshaler.func2
+    0.50MB 0.0015% 98.80% 33209.98MB 99.90%  net/http.(*conn).serve
+         0     0% 98.80% 32233.32MB 96.96%  encoding/json.Marshal (inline)
+         0     0% 98.80% 32233.32MB 96.96%  encoding/json/v2.Marshal
+         0     0% 98.80%  5228.56MB 15.73%  encoding/json/v2.makeMapArshaler.func2
+         0     0% 98.80%  5381.47MB 16.19%  encoding/json/v2.makeSliceArshaler.func2
+         0     0% 98.80%  5381.97MB 16.19%  encoding/json/v2.marshalEncode
+         0     0% 98.80%  3139.05MB  9.44%  encoding/json/v2.newAddressableValue
+         0     0% 98.80% 32233.32MB 96.96%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Marshal
+         0     0% 98.80%   191.55MB  0.58%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*encodeHandler).respond (inline)
+         0     0% 98.80% 32611.74MB 98.10%  net/http.(*ServeMux).ServeHTTP
+         0     0% 98.80%   191.55MB  0.58%  net/http.(*response).WriteHeader
+         0     0% 98.80% 32611.74MB 98.10%  net/http.serverHandler.ServeHTTP

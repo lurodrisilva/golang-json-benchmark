@@ -1,0 +1,7 @@
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-01","reasons":["host busy 11.5% before trial (top: PerfPowerServices 43%, fseventsd 15%, spotlightknowledged 9%, benchctl 6%)"],"seq":1,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-01","reasons":null,"seq":2,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r3600/rep-01","reasons":null,"seq":3,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r3600/rep-01","reasons":null,"seq":4,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r3600/rep-02","reasons":null,"seq":5,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r3600/rep-02","reasons":null,"seq":6,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r3600/rep-03","error":"window start snapshot/profile: context canceled","reasons":["window start snapshot/profile: context canceled"],"seq":7,"status":"error"}

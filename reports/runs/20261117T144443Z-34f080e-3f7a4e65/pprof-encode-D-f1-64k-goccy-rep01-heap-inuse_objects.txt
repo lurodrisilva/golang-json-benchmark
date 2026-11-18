@@ -1,0 +1,22 @@
+File: goccy-server
+Type: inuse_objects
+Time: 2026-11-17 17:41:17 -03
+Showing nodes accounting for 103309, 99.89% of 103422 total
+Dropped 29 nodes (cum <= 517)
+Showing top 15 nodes out of 31
+      flat  flat%   sum%        cum   cum%
+     32768 31.68% 31.68%      56434 54.57%  net/http.(*Server).Serve
+     16384 15.84% 47.53%      16384 15.84%  syscall.anyToSockaddr
+     13108 12.67% 60.20%      18150 17.55%  context.withCancel (inline)
+     12047 11.65% 71.85%      12047 11.65%  bufio.NewWriterSize (inline)
+      8192  7.92% 79.77%      42678 41.27%  net/http.(*conn).serve
+      7282  7.04% 86.81%       7282  7.04%  net/http.(*Server).newConn (inline)
+      5042  4.88% 91.69%       5042  4.88%  context.(*cancelCtx).propagateCancel
+      4246  4.11% 95.79%       4246  4.11%  runtime.mallocgc
+      4240  4.10% 99.89%       4240  4.10%  bufio.NewReaderSize (inline)
+         0     0% 99.89%       4240  4.10%  bufio.NewReader (inline)
+         0     0% 99.89%      18150 17.55%  context.WithCancel
+         0     0% 99.89%      23666 22.88%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run.func4
+         0     0% 99.89%      32768 31.68%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run.func5
+         0     0% 99.89%      16384 15.84%  net.(*TCPListener).Accept
+         0     0% 99.89%      16384 15.84%  net.(*TCPListener).accept

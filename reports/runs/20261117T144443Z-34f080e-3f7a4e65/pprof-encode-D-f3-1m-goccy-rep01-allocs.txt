@@ -1,0 +1,19 @@
+File: goccy-server
+Type: alloc_space
+Time: 2026-11-17 11:52:45 -03
+Duration: 60s, Total samples = 54609.92MB 
+Showing nodes accounting for 54507.34MB, 99.81% of 54609.92MB total
+Dropped 44 nodes (cum <= 273.05MB)
+      flat  flat%   sum%        cum   cum%
+28763.75MB 52.67% 52.67% 54527.87MB 99.85%  github.com/goccy/go-json.marshal
+25737.08MB 47.13% 99.80% 25737.08MB 47.13%  github.com/goccy/go-json/internal/encoder/vm.appendStructKey (inline)
+    6.50MB 0.012% 99.81% 54550.88MB 99.89%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*encodeHandler).ServeHTTP
+         0     0% 99.81% 54527.87MB 99.85%  github.com/goccy/go-json.Marshal
+         0     0% 99.81% 54527.87MB 99.85%  github.com/goccy/go-json.MarshalWithOption (inline)
+         0     0% 99.81% 25739.59MB 47.13%  github.com/goccy/go-json/internal/encoder/run.Code
+         0     0% 99.81% 25739.59MB 47.13%  github.com/goccy/go-json/internal/encoder/run.Encode
+         0     0% 99.81% 25739.59MB 47.13%  github.com/goccy/go-json/internal/encoder/vm.Run
+         0     0% 99.81% 54527.87MB 99.85%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/goccy.Codec.Marshal
+         0     0% 99.81% 54550.88MB 99.89%  net/http.(*ServeMux).ServeHTTP
+         0     0% 99.81% 54607.92MB   100%  net/http.(*conn).serve
+         0     0% 99.81% 54550.88MB 99.89%  net/http.serverHandler.ServeHTTP

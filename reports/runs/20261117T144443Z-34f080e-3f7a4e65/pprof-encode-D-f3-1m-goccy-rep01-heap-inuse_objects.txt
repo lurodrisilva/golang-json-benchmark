@@ -1,0 +1,22 @@
+File: goccy-server
+Type: inuse_objects
+Time: 2026-11-17 17:23:14 -03
+Showing nodes accounting for 57276, 99.33% of 57664 total
+Dropped 31 nodes (cum <= 288)
+Showing top 15 nodes out of 27
+      flat  flat%   sum%        cum   cum%
+     32768 56.83% 56.83%      32768 56.83%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).makeString (inline)
+     10923 18.94% 75.77%      10923 18.94%  net.sockaddrToTCP
+      9104 15.79% 91.56%       9104 15.79%  reflect.mapassign_faststr0
+      4096  7.10% 98.66%       4096  7.10%  net.newFD
+       385  0.67% 99.33%        385  0.67%  bufio.NewWriterSize
+         0     0% 99.33%      41873 72.62%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0% 99.33%      41873 72.62%  github.com/goccy/go-json.unmarshal
+         0     0% 99.33%       9104 15.79%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+         0     0% 99.33%      41873 72.62%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+         0     0% 99.33%      41873 72.62%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).decodeLong
+         0     0% 99.33%      32768 56.83%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).Decode
+         0     0% 99.33%      32768 56.83%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).decodeStringField
+         0     0% 99.33%      41873 72.62%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+         0     0% 99.33%      41873 72.62%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/goccy.Codec.Unmarshal
+         0     0% 99.33%      41873 72.62%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.LoadEncodeValue

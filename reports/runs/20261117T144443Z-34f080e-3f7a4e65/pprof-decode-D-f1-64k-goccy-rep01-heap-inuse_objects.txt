@@ -1,0 +1,22 @@
+File: goccy-server
+Type: inuse_objects
+Time: 2026-11-16 17:45:54 -03
+Showing nodes accounting for 62742, 100% of 62749 total
+Dropped 10 nodes (cum <= 313)
+Showing top 15 nodes out of 30
+      flat  flat%   sum%        cum   cum%
+     32768 52.22% 52.22%      32768 52.22%  net/http.(*Server).Serve
+     16385 26.11% 78.33%      22859 36.43%  net/http.(*conn).serve
+      4681  7.46% 85.79%       4681  7.46%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run
+      3640  5.80% 91.59%       3640  5.80%  reflect.mapassign_faststr0
+      2441  3.89% 95.48%       2441  3.89%  runtime.mallocgc
+      1799  2.87% 98.35%       1799  2.87%  bufio.NewReaderSize (inline)
+      1028  1.64%   100%       1028  1.64%  bufio.NewWriterSize (inline)
+         0     0%   100%       1799  2.87%  bufio.NewReader (inline)
+         0     0%   100%       3647  5.81%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0%   100%       3647  5.81%  github.com/goccy/go-json.unmarshal
+         0     0%   100%       3640  5.80%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+         0     0%   100%       3640  5.80%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+         0     0%   100%       1820  2.90%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).decodeLong
+         0     0%   100%       3640  5.80%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+         0     0%   100%       3647  5.81%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/goccy.Codec.Unmarshal

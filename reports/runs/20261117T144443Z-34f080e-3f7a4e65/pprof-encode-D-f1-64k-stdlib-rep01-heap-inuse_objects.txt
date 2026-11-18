@@ -1,0 +1,22 @@
+File: stdlib-server
+Type: inuse_objects
+Time: 2026-11-17 17:35:15 -03
+Showing nodes accounting for 98697, 100% of 98718 total
+Dropped 16 nodes (cum <= 493)
+Showing top 15 nodes out of 50
+      flat  flat%   sum%        cum   cum%
+     32768 33.19% 33.19%      52793 53.48%  net/http.(*Server).Serve
+     16384 16.60% 49.79%      16384 16.60%  syscall.anyToSockaddr
+     10923 11.06% 60.86%      10923 11.06%  reflect.makemap
+      9766  9.89% 70.75%       9766  9.89%  runtime.mallocgc
+      9363  9.48% 80.23%       9363  9.48%  context.(*cancelCtx).Done
+      8192  8.30% 88.53%      25236 25.56%  net/http.(*conn).serve
+      3641  3.69% 92.22%       3641  3.69%  net/http.(*Server).newConn (inline)
+      2698  2.73% 94.95%       2698  2.73%  bufio.NewWriterSize (inline)
+      2521  2.55% 97.51%      11884 12.04%  context.(*cancelCtx).propagateCancel
+      2441  2.47%   100%       2441  2.47%  bufio.NewReaderSize (inline)
+         0     0%   100%       2441  2.47%  bufio.NewReader (inline)
+         0     0%   100%      11884 12.04%  context.WithCancel
+         0     0%   100%      11884 12.04%  context.withCancel (inline)
+         0     0%   100%      10923 11.06%  encoding/json.Unmarshal
+         0     0%   100%      10923 11.06%  encoding/json/v2.Unmarshal

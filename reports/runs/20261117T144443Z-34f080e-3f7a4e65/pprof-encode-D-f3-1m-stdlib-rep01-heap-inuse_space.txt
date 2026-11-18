@@ -1,0 +1,21 @@
+File: stdlib-server
+Type: inuse_space
+Time: 2026-11-17 17:29:14 -03
+Showing nodes accounting for 13532.65kB, 100% of 13532.65kB total
+Showing top 15 nodes out of 52
+      flat  flat%   sum%        cum   cum%
+ 4942.27kB 36.52% 36.52%  4942.27kB 36.52%  encoding/json/v2.makeStructArshaler.func2
+ 2570.01kB 18.99% 55.51%  2570.01kB 18.99%  bufio.NewWriterSize
+ 1542.01kB 11.39% 66.91%  1542.01kB 11.39%  bufio.NewReaderSize (inline)
+ 1184.27kB  8.75% 75.66%  1184.27kB  8.75%  bytes.Clone (inline)
+ 1024.28kB  7.57% 83.23%  1024.28kB  7.57%  reflect.mapassign_faststr0
+  732.77kB  5.41% 88.64%   732.77kB  5.41%  reflect.growslice
+     513kB  3.79% 92.43%      513kB  3.79%  runtime.mallocgc
+  512.02kB  3.78% 96.22%   512.02kB  3.78%  net.sockaddrToTCP
+  512.01kB  3.78%   100%   512.01kB  3.78%  encoding/json/v2.makeString
+         0     0%   100%  1542.01kB 11.39%  bufio.NewReader
+         0     0%   100%  6126.54kB 45.27%  encoding/json.Marshal
+         0     0%   100%  2269.06kB 16.77%  encoding/json.Unmarshal
+         0     0%   100%  6126.54kB 45.27%  encoding/json/v2.Marshal
+         0     0%   100%  2269.06kB 16.77%  encoding/json/v2.Unmarshal
+         0     0%   100%  1024.28kB  7.57%  encoding/json/v2.makeMapArshaler.func3

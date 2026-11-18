@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: cpu
+Time: 2026-11-16 17:36:53 -03
+Duration: 60.16s, Total samples = 122.99s (204.43%)
+Showing nodes accounting for 106.62s, 86.69% of 122.99s total
+Dropped 418 nodes (cum <= 0.61s)
+Showing top 20 nodes out of 126
+      flat  flat%   sum%        cum   cum%
+    84.07s 68.36% 68.36%     84.07s 68.36%  syscall.rawsyscalln
+     3.75s  3.05% 71.40%      3.75s  3.05%  runtime.pthread_kill
+     3.64s  2.96% 74.36%      3.64s  2.96%  runtime.kevent
+     2.15s  1.75% 76.11%      2.15s  1.75%  encoding/json/internal/jsonwire.ConsumeSimpleString (inline)
+     1.70s  1.38% 77.49%      1.70s  1.38%  runtime.usleep
+     1.36s  1.11% 78.60%      1.37s  1.11%  encoding/json/internal/jsonwire.ConsumeWhitespace (inline)
+     1.26s  1.02% 79.62%      5.21s  4.24%  encoding/json/jsontext.(*decoderState).ReadValue
+     1.05s  0.85% 80.48%      1.05s  0.85%  runtime.pthread_cond_wait
+     1.04s  0.85% 81.32%     20.42s 16.60%  encoding/json/v2.makeStructArshaler.func3
+     1.02s  0.83% 82.15%      5.48s  4.46%  encoding/json/jsontext.(*decoderState).consumeValue
+     0.96s  0.78% 82.93%      1.05s  0.85%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).str
+     0.79s  0.64% 83.58%      1.69s  1.37%  encoding/json/jsontext.(*decoderState).PeekKind
+     0.65s  0.53% 84.10%      0.88s  0.72%  encoding/json/jsontext.(*decoderState).ReadToken
+     0.54s  0.44% 84.54%      0.86s   0.7%  runtime.pcvalue
+     0.53s  0.43% 84.97%      1.66s  1.35%  runtime.mapaccess2_faststr
+     0.49s   0.4% 85.37%      1.31s  1.07%  encoding/json/v2.makeString
+     0.45s  0.37% 85.74%      0.78s  0.63%  internal/runtime/maps.(*Map).getWithoutKeySmallFastStr
+     0.43s  0.35% 86.09%      0.73s  0.59%  encoding/json/internal/jsonwire.ConsumeStringResumable
+     0.41s  0.33% 86.42%      2.06s  1.67%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).object
+     0.33s  0.27% 86.69%      2.07s  1.68%  encoding/json/jsontext.(*decoderState).consumeObject

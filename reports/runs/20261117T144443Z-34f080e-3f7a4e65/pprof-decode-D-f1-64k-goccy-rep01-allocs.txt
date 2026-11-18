@@ -1,0 +1,28 @@
+File: goccy-server
+Type: alloc_space
+Time: 2026-11-16 09:05:25 -03
+Duration: 60s, Total samples = 48349.81MB 
+Showing nodes accounting for 47694.76MB, 98.65% of 48349.81MB total
+Dropped 82 nodes (cum <= 241.75MB)
+Showing top 20 nodes out of 35
+      flat  flat%   sum%        cum   cum%
+14387.15MB 29.76% 29.76% 14387.15MB 29.76%  reflect.growslice
+13540.46MB 28.01% 57.76% 13543.96MB 28.01%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+12541.94MB 25.94% 83.70% 12541.94MB 25.94%  reflect.mapassign_faststr0
+ 3912.07MB  8.09% 91.79%  3912.07MB  8.09%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).makeString (inline)
+ 2106.10MB  4.36% 96.15%  2106.10MB  4.36%  reflect.makemap
+  542.01MB  1.12% 97.27%   542.01MB  1.12%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).unescapeString
+  311.50MB  0.64% 97.91%   311.50MB  0.64%  reflect.unsafe_New
+  282.50MB  0.58% 98.50%   282.50MB  0.58%  github.com/goccy/go-json/internal/decoder.allocatorOf.func18
+   49.01MB   0.1% 98.60%   267.06MB  0.55%  net/http.(*conn).readRequest
+   19.50MB  0.04% 98.64% 48040.83MB 99.36%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+    2.50MB 0.0052% 98.65% 48333.80MB   100%  net/http.(*conn).serve
+         0     0% 98.65% 34145.21MB 70.62%  github.com/goccy/go-json.Unmarshal (inline)
+         0     0% 98.65% 34145.21MB 70.62%  github.com/goccy/go-json.unmarshal
+         0     0% 98.65%   453.01MB  0.94%  github.com/goccy/go-json/internal/decoder.(*basicPtrDecoder).Decode
+         0     0% 98.65% 15823.06MB 32.73%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+         0     0% 98.65%   311.50MB  0.64%  github.com/goccy/go-json/internal/decoder.(*ptrDecoder).Decode
+         0     0% 98.65% 34067.79MB 70.46%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).Decode
+         0     0% 98.65% 15833.25MB 32.75%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).decodeLong
+         0     0% 98.65% 14387.15MB 29.76%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).grow
+         0     0% 98.65%  4884.32MB 10.10%  github.com/goccy/go-json/internal/decoder.(*sliceDecoder).growBuf (inline)

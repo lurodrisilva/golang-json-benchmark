@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: alloc_space
+Time: 2026-11-16 08:59:24 -03
+Duration: 60s, Total samples = 50069.59MB 
+Showing nodes accounting for 49466.12MB, 98.79% of 50069.59MB total
+Dropped 83 nodes (cum <= 250.35MB)
+Showing top 20 nodes out of 31
+      flat  flat%   sum%        cum   cum%
+15957.98MB 31.87% 31.87% 15957.98MB 31.87%  reflect.growslice
+13518.49MB 27.00% 58.87% 13523.49MB 27.01%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+12385.90MB 24.74% 83.61% 12385.90MB 24.74%  reflect.mapassign_faststr0
+ 2692.05MB  5.38% 88.98%  2692.05MB  5.38%  encoding/json/v2.makeString
+ 2118.10MB  4.23% 93.22%  2118.10MB  4.23%  reflect.makemap
+ 1936.53MB  3.87% 97.08%  1936.53MB  3.87%  reflect.unsafe_New
+  785.53MB  1.57% 98.65%   785.53MB  1.57%  slices.Grow[go.shape.[]uint8,go.shape.uint8] (inline)
+   41.01MB 0.082% 98.73%   270.06MB  0.54%  net/http.(*conn).readRequest
+      20MB  0.04% 98.77% 49765.77MB 99.39%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+    8.04MB 0.016% 98.79%  3485.62MB  6.96%  encoding/json/v2.makeStringArshaler.func2
+    2.50MB 0.005% 98.79% 50055.09MB   100%  net/http.(*conn).serve
+         0     0% 98.79% 35885.12MB 71.67%  encoding/json.Unmarshal (inline)
+         0     0% 98.79%   785.53MB  1.57%  encoding/json/internal/jsonwire.AppendUnquote
+         0     0% 98.79%   785.53MB  1.57%  encoding/json/internal/jsonwire.UnquoteMayCopy
+         0     0% 98.79% 35885.12MB 71.67%  encoding/json/v2.Unmarshal
+         0     0% 98.79% 16263.03MB 32.48%  encoding/json/v2.makeMapArshaler.func3
+         0     0% 98.79%   584.51MB  1.17%  encoding/json/v2.makePointerArshaler.func3
+         0     0% 98.79% 35852.09MB 71.60%  encoding/json/v2.makeSliceArshaler.func3
+         0     0% 98.79% 35884.12MB 71.67%  encoding/json/v2.makeStructArshaler.func3
+         0     0% 98.79%  1367.52MB  2.73%  encoding/json/v2.newAddressableValue

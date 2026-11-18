@@ -1,0 +1,21 @@
+File: goccy-server
+Type: inuse_space
+Time: 2026-11-17 17:23:14 -03
+Showing nodes accounting for 11156.26kB, 100% of 11156.26kB total
+Showing top 15 nodes out of 58
+      flat  flat%   sum%        cum   cum%
+ 3706.70kB 33.23% 33.23%  3706.70kB 33.23%  github.com/goccy/go-json/internal/encoder/vm.appendStructKey (inline)
+ 2560.70kB 22.95% 56.18%  2560.70kB 22.95%  reflect.mapassign_faststr0
+ 1542.01kB 13.82% 70.00%  1542.01kB 13.82%  bufio.NewWriterSize
+  783.76kB  7.03% 77.03%   783.76kB  7.03%  reflect.growslice
+     514kB  4.61% 81.63%      514kB  4.61%  bufio.NewReaderSize (inline)
+     513kB  4.60% 86.23%      513kB  4.60%  runtime.mallocgc
+  512.06kB  4.59% 90.82%   512.06kB  4.59%  net.newFD
+  512.02kB  4.59% 95.41%   512.02kB  4.59%  net.sockaddrToTCP
+  512.01kB  4.59%   100%   512.01kB  4.59%  github.com/goccy/go-json/internal/decoder.(*RuntimeContext).makeString (inline)
+         0     0%   100%      514kB  4.61%  bufio.NewReader
+         0     0%   100%  3706.70kB 33.23%  github.com/goccy/go-json.Marshal
+         0     0%   100%  3706.70kB 33.23%  github.com/goccy/go-json.MarshalWithOption (inline)
+         0     0%   100%  3856.47kB 34.57%  github.com/goccy/go-json.Unmarshal
+         0     0%   100%  3706.70kB 33.23%  github.com/goccy/go-json.marshal
+         0     0%   100%  3856.47kB 34.57%  github.com/goccy/go-json.unmarshal

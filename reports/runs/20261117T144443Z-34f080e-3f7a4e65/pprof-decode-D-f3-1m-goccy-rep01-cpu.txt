@@ -1,0 +1,28 @@
+File: goccy-server
+Type: cpu
+Time: 2026-11-16 22:01:14 -03
+Duration: 60.16s, Total samples = 69.95s (116.27%)
+Showing nodes accounting for 64.44s, 92.12% of 69.95s total
+Dropped 279 nodes (cum <= 0.35s)
+Showing top 20 nodes out of 124
+      flat  flat%   sum%        cum   cum%
+    21.92s 31.34% 31.34%     21.92s 31.34%  syscall.rawsyscalln
+    16.02s 22.90% 54.24%     16.02s 22.90%  runtime.madvise
+     9.21s 13.17% 67.41%      9.21s 13.17%  runtime.kevent
+     4.21s  6.02% 73.42%      4.21s  6.02%  runtime.usleep
+     3.51s  5.02% 78.44%      3.51s  5.02%  runtime.pthread_kill
+     2.62s  3.75% 82.19%      2.62s  3.75%  runtime.pthread_cond_signal
+     2.59s  3.70% 85.89%      2.59s  3.70%  runtime.pthread_cond_wait
+     1.09s  1.56% 87.45%      1.20s  1.72%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).str
+     0.55s  0.79% 88.23%      0.55s  0.79%  runtime.pthread_cond_timedwait_relative_np
+     0.47s  0.67% 88.91%      1.81s  2.59%  github.com/goccy/go-json/internal/decoder.(*stringDecoder).decodeStringField
+     0.40s  0.57% 89.48%      0.49s   0.7%  github.com/goccy/go-json/internal/decoder.(*structDecoder).decodeKey
+     0.36s  0.51% 89.99%      0.52s  0.74%  runtime.mallocgcTinySC2
+     0.31s  0.44% 90.44%      0.35s   0.5%  runtime.tryDeferToSpanScan
+     0.25s  0.36% 90.79%      1.46s  2.09%  runtime.mallocgc
+     0.20s  0.29% 91.08%      5.24s  7.49%  github.com/goccy/go-json/internal/decoder.(*structDecoder).Decode
+     0.20s  0.29% 91.37%      0.43s  0.61%  runtime.pcvalue
+     0.14s   0.2% 91.57%      1.93s  2.76%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).object
+     0.13s  0.19% 91.75%      1.94s  2.77%  github.com/goccy/go-json/internal/decoder.(*mapDecoder).Decode
+     0.13s  0.19% 91.94%      1.93s  2.76%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/policy.(*scanner).value
+     0.13s  0.19% 92.12%      0.93s  1.33%  runtime.slicebytetostring

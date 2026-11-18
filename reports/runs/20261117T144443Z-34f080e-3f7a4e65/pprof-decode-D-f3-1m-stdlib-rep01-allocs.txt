@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: alloc_space
+Time: 2026-11-16 19:15:58 -03
+Duration: 60.09s, Total samples = 63403.70MB 
+Showing nodes accounting for 63305.09MB, 99.84% of 63403.70MB total
+Dropped 68 nodes (cum <= 317.02MB)
+Showing top 20 nodes out of 30
+      flat  flat%   sum%        cum   cum%
+22402.41MB 35.33% 35.33% 22402.41MB 35.33%  reflect.growslice
+15792.34MB 24.91% 60.24% 15792.34MB 24.91%  reflect.mapassign_faststr0
+15550.37MB 24.53% 84.77% 15550.37MB 24.53%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.readBody
+ 3460.57MB  5.46% 90.22%  3460.57MB  5.46%  encoding/json/v2.makeString
+ 2617.12MB  4.13% 94.35%  2617.12MB  4.13%  reflect.makemap
+ 2507.04MB  3.95% 98.31%  2507.04MB  3.95%  reflect.unsafe_New
+  928.53MB  1.46% 99.77%   928.53MB  1.46%  slices.Grow[go.shape.[]uint8,go.shape.uint8] (inline)
+   46.21MB 0.073% 99.84%  4435.31MB  7.00%  encoding/json/v2.makeStringArshaler.func2
+    0.50MB 0.00079% 99.84% 63342.11MB 99.90%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0% 99.84% 47763.23MB 75.33%  encoding/json.Unmarshal (inline)
+         0     0% 99.84%   928.53MB  1.46%  encoding/json/internal/jsonwire.AppendUnquote
+         0     0% 99.84%   928.53MB  1.46%  encoding/json/internal/jsonwire.UnquoteMayCopy
+         0     0% 99.84% 47763.23MB 75.33%  encoding/json/v2.Unmarshal
+         0     0% 99.84% 20773.99MB 32.76%  encoding/json/v2.makeMapArshaler.func3
+         0     0% 99.84%   758.01MB  1.20%  encoding/json/v2.makePointerArshaler.func3
+         0     0% 99.84% 47704.01MB 75.24%  encoding/json/v2.makeSliceArshaler.func3
+         0     0% 99.84% 47754.22MB 75.32%  encoding/json/v2.makeStructArshaler.func3
+         0     0% 99.84%  1768.53MB  2.79%  encoding/json/v2.newAddressableValue
+         0     0% 99.84% 47754.22MB 75.32%  encoding/json/v2.unmarshalDecode
+         0     0% 99.84% 47763.23MB 75.33%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal

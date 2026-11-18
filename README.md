@@ -2,7 +2,7 @@
 
 A reproducible comparison of HTTP request **deserialization** (decode, `POST /ingest`) and response **serialization** (encode, `GET /batch`) performance between Go's `encoding/json` and [`github.com/goccy/go-json`](https://github.com/goccy/go-json).
 
-**Status:** decode results from run `20261116T115723Z-af6c2f3-06dccad4` are published under [`reports/runs/`](reports/runs/) (pilot-grade, single Apple M3 host). The encode extension ([`docs/plan/encode-plan.md`](docs/plan/encode-plan.md), ADR 0004) is implemented. Its pilot and authoritative run are pending approval, and **no encode results exist yet**.
+**Status:** decode results (run `20261116T115723Z-af6c2f3-06dccad4`) and the combined decode + encode report (encode runs `20261117T144443Z-34f080e-3f7a4e65`, `20261118T102549Z-4f2c938-92dbc890`, `20261118T113550Z-65180c7-98d18137`) are published under [`reports/runs/`](reports/runs/). All results are pilot-grade: single Apple M3 host, k6 and server co-located over loopback. Libraries are compared only within the same operation, payload and load; encode and decode are never compared with each other.
 
 ## What is compared
 Two separately built `net/http` servers, `stdlib-server` and `goccy-server`, run identical code apart from one `codec.Unmarshal` call. They expose `POST /ingest`, read the body into a bounded buffer, apply a shared strict-input policy, decode it into a fresh typed `IngestBatch`, validate it, and return `202` with an empty body. Under go1.27 the default `encoding/json` is v2-backed, so a second pair built with `GOEXPERIMENT=nojsonv2` is reported separately (ADR 0002).
