@@ -89,6 +89,49 @@ Ranges cover every fixed-load cell (Pair D, default toolchain) and the three pay
 
 † Both binaries built with `GOEXPERIMENT=nojsonv2` (the pre-v2 stdlib engine). This row is reported separately and is not comparable with the default-toolchain rows.
 
+## Security and maintenance
+
+This section summarises public records collected on 2026-11-18 for the two years from 2024-11-18 to 2026-11-18. It does not come from the benchmark harness, and the counts depend on the queries listed under each table.
+
+### CVEs and security advisories (last 2 years)
+| | `encoding/json` (Go standard library) | `github.com/goccy/go-json` |
+|---|---|---|
+| Entries in the Go vulnerability database ([vuln.go.dev](https://vuln.go.dev) / [OSV](https://osv.dev)) | **0** affecting `encoding/json`. The database lists 182–188 standard-library entries in total, none with an `encoding/json` import path. | **0**. The module is not listed. |
+| CVEs in NVD | 0 for `encoding/json` | 0 (keyword search "goccy") |
+| GitHub security advisories | none for `encoding/json` | **1**: [GHSA-289v-428m-xfp2](https://github.com/goccy/go-json/security/advisories/GHSA-289v-428m-xfp2), medium severity, published 2026-11-03, no CVE ID assigned |
+| What the goccy advisory covers | — | `Unmarshal` of untrusted JSON whose object key ends with a trailing backslash reads past the end of the input buffer through unsafe pointer reads. It usually panics, causing a denial of service. Affected `>= 0.7.0, < 0.11.0`, fixed in **0.11.0**. |
+| Affects the version benchmarked here? | — | No. This repo pins **v0.12.0**. |
+
+Notes:
+- The closest standard-library entry is GO-2024-2610 (March 2024), "Errors returned from JSON marshaling may break template escaping". It is in `html/template`, not `encoding/json`, and is older than the window.
+- Other `encoding/*` entries in the window affect `encoding/pem`, `encoding/asn1` and `encoding/xml`, not JSON.
+- goccy's memory-safety bug comes from its `unsafe`-based decoder. The standard library does not use that design.
+- Queries: `api.osv.dev/v1/query` for packages `stdlib` and `github.com/goccy/go-json` (ecosystem Go), the `vuln.go.dev` module index, NVD CVE API keyword search, and GitHub's repository security advisories and global advisory database.
+
+### Pace of issue closing on GitHub (last 2 years)
+`encoding/json` has no repository of its own. Its issues live in `golang/go`, where titles start with the package path by convention, so its figures come from `repo:golang/go is:issue in:title encoding/json`. That query also matches `encoding/json/v2` issues and proposals (29 of the 152).
+
+| Metric (issues created 2024-11-18 to 2026-11-18) | `encoding/json` (golang/go) | `goccy/go-json` |
+|---|---|---|
+| Issues opened | 152 | 44 |
+| Of those, closed | 117 (77%) | 40 (91%) |
+| Close reason: completed / not planned / duplicate | 88 / 19 / 10 | 34 / 6 / 0 |
+| Median time to close | **5.2 days** | **212 days** |
+| Interquartile range of time to close | 0.2–55 days | 47–524 days |
+| Closed within 7 days / 30 days | 63 / 80 | 5 / 8 |
+| Still open | 35, median age 135 days | 4, median age 266 days |
+| All issues closed in the window, any creation date | 193 | 106 |
+| All open issues today | 55 | 20 |
+
+How closures were spread over time:
+- **`encoding/json`:** closures came in steadily every quarter: 4, 7, 6, 17, 19, 16, 24, **81**, 19 from 2024-Q4 to 2026-Q4. The 2026-Q3 spike lines up with the Go 1.27 cycle, which made the v2-backed implementation the default.
+- **`goccy/go-json`:** **103 of its 106 closures happened in September–October 2026**, alongside releases v0.11.0–v0.11.2 (September 2026) and v0.12.0 (2026-10-29). In the 22 months before that, only 2 issues were closed, and the previous release was v0.10.6 (2026-03-12). 142 pull requests were merged in the window.
+
+Reading the numbers:
+- `encoding/json` issues are usually triaged and closed within days.
+- goccy cleared a multi-year backlog in one recent burst after a long quiet period. It is too early to tell whether that pace will last.
+- Issue counts are not quality measures. `golang/go` has a dedicated triage process, and many of its closures are duplicates or declined proposals.
+
 ## Quick start
 ```sh
 make vet test race conformance   # correctness first (both GOEXPERIMENT settings)
