@@ -16,7 +16,7 @@ All numbers below come from the published report [`reports/runs/20261117T144443Z
 ### Executive summary
 - On this hardware, `goccy/go-json` v0.12.0 was faster than Go 1.27.4's `encoding/json` in every measured case, for both decoding (Unmarshal) and encoding (Marshal).
 - **Codec time.** Without HTTP, goccy took about 67–68% less time to Unmarshal and 59–62% less to Marshal. Under HTTP load, the codec call itself took 68–70% less (decode) and 51–62% less (encode).
-- **Request latency and CPU.** End-to-end HTTP request latency was 44–58% lower, and CPU per request 40–53% lower. The network and shared server code dilute the codec gap.
+- **Request latency and CPU.** End-to-end HTTP request latency was 44–58% lower, and CPU per request 40–53% lower.
 - **Throughput.** goccy sustained about 2.4× the request rate on 64 KiB payloads, for both decode and encode.
 - **Memory depends on the operation.** goccy allocated 7–28% fewer bytes per request when encoding. When decoding, it was about equal at 64–256 KiB but allocated 9–10% *more* at 1 MiB.
 - **Behaviour.** Both libraries produced identical results on the 57-case decode and 33-case encode correctness suites, with 0 deviations. Encoded output was byte-identical.
