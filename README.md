@@ -56,38 +56,42 @@ Ranges cover every fixed-load cell (Pair D, default toolchain) and the three pay
 ### Marshal (encode)
 `GET /batch`, default toolchain. Values are stdlib → goccy, with the change in brackets.
 
-| Payload @ rate | Trials (stdlib / goccy) | HTTP median (ms) | Marshal median (ms) | CPU per request (µs) | Bytes allocated per request |
-|---|---|---|---|---|---|
-| Microbench 64 KiB | 10 / 10 | — | 0.187 → 0.072 (62%) | — | 16% fewer |
-| Microbench 256 KiB | 10 / 10 | — | 0.759 → 0.308 (60%) | — | 16% fewer |
-| Microbench 1 MiB | 10 / 10 | — | 3.06 → 1.27 (59%) | — | 16% fewer |
-| 64 KiB @ 3,600 rps | 2 / 2 | 0.286 → 0.121 (58%) | 0.200 → 0.077 (62%) | 283 → 143 (50%) | 16% fewer |
-| 64 KiB @ 4,500 rps | 5 / 6 | 0.276 → 0.121 (56%) | 0.204 → 0.077 (62%) | 276 → 141 (49%) | 81.0K → 68.1K (16%) |
-| 64 KiB @ 7,200 rps* | 2 / 4 | 0.249 → 0.122 (51%) | 0.201 → 0.077 (62%) | 280 → 145 (49%) | 16% fewer |
-| 256 KiB @ 1,125 rps | 5 / 5 | 1.062 → 0.548 (48%) | 0.787 → 0.332 (58%) | 982 → 519 (47%) | 371K → 308K (17%) |
-| 256 KiB @ 1,800 rps | 5 / 5 | 1.019 → 0.573 (44%) | 0.812 → 0.311 (62%) | 1,020 → 475 (53%) | 341K → 290K (15%) |
-| 1 MiB @ 300 rps | 5 / 5 | 3.780 → 2.090 (45%) | 3.244 → 1.599 (51%) | 4,006 → 2,406 (40%) | 3.64M → 2.61M (28%) |
-| 1 MiB @ 480 rps | 5 / 6 | 3.815 → 1.748 (54%) | 3.395 → 1.298 (62%) | 3,966 → 1,961 (51%) | 2.59M → 2.40M (7%) |
+| Payload @ rate | Trials (stdlib / goccy) | HTTP median (ms) | Marshal median (ms) | Marshal P99 (ms) | CPU per request (µs) | Bytes allocated per request |
+|---|---|---|---|---|---|---|
+| Microbench 64 KiB | 10 / 10 | — | 0.187 → 0.072 (62%) | — | — | 16% fewer |
+| Microbench 256 KiB | 10 / 10 | — | 0.759 → 0.308 (60%) | — | — | 16% fewer |
+| Microbench 1 MiB | 10 / 10 | — | 3.06 → 1.27 (59%) | — | — | 16% fewer |
+| 64 KiB @ 3,600 rps | 2 / 2 | 0.286 → 0.121 (58%) | 0.200 → 0.077 (62%) | 0.423 → 0.167 (61%) | 283 → 143 (50%) | 16% fewer |
+| 64 KiB @ 4,500 rps | 5 / 6 | 0.276 → 0.121 (56%) | 0.204 → 0.077 (62%) | 0.441 → 0.163 (63%) | 276 → 141 (49%) | 81.0K → 68.1K (16%) |
+| 64 KiB @ 7,200 rps* | 2 / 4 | 0.249 → 0.122 (51%) | 0.201 → 0.077 (62%) | 0.732 → 0.193 (74%) | 280 → 145 (49%) | 16% fewer |
+| 256 KiB @ 1,125 rps | 5 / 5 | 1.062 → 0.548 (48%) | 0.787 → 0.332 (58%) | 1.470 → 0.563 (62%) | 982 → 519 (47%) | 371K → 308K (17%) |
+| 256 KiB @ 1,800 rps | 5 / 5 | 1.019 → 0.573 (44%) | 0.812 → 0.311 (62%) | 1.696 → 0.587 (65%) | 1,020 → 475 (53%) | 341K → 290K (15%) |
+| 1 MiB @ 300 rps | 5 / 5 | 3.780 → 2.090 (45%) | 3.244 → 1.599 (51%) | 3.950 → 2.414 (39%) | 4,006 → 2,406 (40%) | 3.64M → 2.61M (28%) |
+| 1 MiB @ 480 rps | 5 / 6 | 3.815 → 1.748 (54%) | 3.395 → 1.298 (62%) | 4.856 → 1.995 (59%) | 3,966 → 1,961 (51%) | 2.59M → 2.40M (7%) |
 
 \* 7,200 rps is above stdlib's 64 KiB encode saturation point (4,500 rps), so most stdlib trials there were invalid. Response sizes were identical for both libraries: 65,008 / 260,564 / 1,044,267 bytes.
+
+Marshal P99: P99 is the median over trials of each trial's 99th-percentile codec call time, measured on the server (every trial had at least 10,000 samples). The microbenchmarks report averages only, so they have no P99. P99 is noisier than the median: host stalls move it, which is why several cells were inconclusive for P99.
 
 ### Unmarshal (decode)
 `POST /ingest`. Values are stdlib → goccy, with the change in brackets. A negative change means goccy used more.
 
-| Payload @ rate | Trials (stdlib / goccy) | HTTP median (ms) | Unmarshal median (ms) | CPU per request (µs) | Bytes allocated per request |
-|---|---|---|---|---|---|
-| Microbench 64 KiB | 10 / 10 | — | 0.390 → 0.129 (67%) | — | 5–8% fewer |
-| Microbench 256 KiB | 10 / 10 | — | 1.57 → 0.51 (68%) | — | 5–8% fewer |
-| Microbench 1 MiB | 10 / 10 | — | 6.38 → 2.02 (68%) | — | 5–8% fewer |
-| 64 KiB @ 2,000 rps | 5 / 5 | 0.630 → 0.347 (45%) | 0.407 → 0.123 (70%) | 660 → 378 (43%) | 274K → 265K (3%) |
-| 64 KiB @ 3,200 rps | 5 / 5 | 0.616 → 0.336 (46%) | 0.413 → 0.128 (69%) | 671 → 381 (43%) | 274K → 265K (4%) |
-| 256 KiB @ 625 rps | 5 / 5 | 2.260 → 1.148 (49%) | 1.596 → 0.491 (69%) | 2,468 → 1,362 (45%) | 1.054M → 1.062M (−1%) |
-| 256 KiB @ 1,000 rps | 5 / 5 | 2.293 → 1.181 (49%) | 1.625 → 0.498 (69%) | 2,492 → 1,350 (46%) | about equal |
-| 1 MiB @ 160 rps | 5 / 5 | 9.168 → 4.527 (51%) | 6.635 → 2.110 (68%) | 9,666 → 5,002 (48%) | 4.32M → 4.72M (−9%) |
-| 1 MiB @ 256 rps | 5 / 5 | 9.341 → 4.628 (50%) | 6.885 → 2.166 (69%) | 9,788 → 5,056 (48%) | 4.32M → 4.75M (−10%) |
-| 64 KiB @ 1,625 rps, legacy engine† | 5 / 5 | 0.871 → 0.345 (60%) | 0.650 → 0.121 (81%) | 912 → 372 (59%) | 290K → 266K (8%) |
+| Payload @ rate | Trials (stdlib / goccy) | HTTP median (ms) | Unmarshal median (ms) | Unmarshal P99 (ms) | CPU per request (µs) | Bytes allocated per request |
+|---|---|---|---|---|---|---|
+| Microbench 64 KiB | 10 / 10 | — | 0.390 → 0.129 (67%) | — | — | 5–8% fewer |
+| Microbench 256 KiB | 10 / 10 | — | 1.57 → 0.51 (68%) | — | — | 5–8% fewer |
+| Microbench 1 MiB | 10 / 10 | — | 6.38 → 2.02 (68%) | — | — | 5–8% fewer |
+| 64 KiB @ 2,000 rps | 5 / 5 | 0.630 → 0.347 (45%) | 0.407 → 0.123 (70%) | 0.862 → 0.279 (68%) | 660 → 378 (43%) | 274K → 265K (3%) |
+| 64 KiB @ 3,200 rps | 5 / 5 | 0.616 → 0.336 (46%) | 0.413 → 0.128 (69%) | 0.971 → 0.307 (68%) | 671 → 381 (43%) | 274K → 265K (4%) |
+| 256 KiB @ 625 rps | 5 / 5 | 2.260 → 1.148 (49%) | 1.596 → 0.491 (69%) | 2.066 → 0.830 (60%) | 2,468 → 1,362 (45%) | 1.054M → 1.062M (−1%) |
+| 256 KiB @ 1,000 rps | 5 / 5 | 2.293 → 1.181 (49%) | 1.625 → 0.498 (69%) | 3.277 → 0.985 (70%) | 2,492 → 1,350 (46%) | about equal |
+| 1 MiB @ 160 rps | 5 / 5 | 9.168 → 4.527 (51%) | 6.635 → 2.110 (68%) | 7.085 → 2.358 (67%) | 9,666 → 5,002 (48%) | 4.32M → 4.72M (−9%) |
+| 1 MiB @ 256 rps | 5 / 5 | 9.341 → 4.628 (50%) | 6.885 → 2.166 (69%) | 7.684 → 2.518 (67%) | 9,788 → 5,056 (48%) | 4.32M → 4.75M (−10%) |
+| 64 KiB @ 1,625 rps, legacy engine† | 5 / 5 | 0.871 → 0.345 (60%) | 0.650 → 0.121 (81%) | 1.244 → 0.269 (78%) | 912 → 372 (59%) | 290K → 266K (8%) |
 
 † Both binaries built with `GOEXPERIMENT=nojsonv2` (the pre-v2 stdlib engine). This row is reported separately and is not comparable with the default-toolchain rows.
+
+Unmarshal P99: P99 is the median over trials of each trial's 99th-percentile codec call time, measured on the server (every trial had at least 10,000 samples). The microbenchmarks report averages only, so they have no P99. P99 is noisier than the median: host stalls move it, which is why several cells were inconclusive for P99.
 
 ## Security and maintenance
 
