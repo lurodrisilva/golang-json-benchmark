@@ -39,19 +39,19 @@ All numbers below come from the published report [`reports/runs/20261117T144443Z
 | Hardware | Apple M3 (4 performance + 4 efficiency cores), 24 GiB RAM, macOS. `GOMAXPROCS=4` for the server. k6 ran on the same machine, and macOS offers no core pinning. |
 
 ### Overall results
-Ranges cover every fixed-load cell (Pair D, default toolchain) and the three payload sizes.
+Ranges cover every fixed-load cell (Pair D, default toolchain) and the three payload sizes. Percentages describe goccy relative to stdlib: "68% less" means goccy took 68% less than stdlib. Rate rows give each library's own value.
 
-| Metric | Unmarshal (decode): goccy vs stdlib | Marshal (encode): goccy vs stdlib |
+| Metric | Unmarshal (decode) | Marshal (encode) |
 |---|---|---|
 | Codec-only microbenchmark time (no HTTP) | 67–68% less | 59–62% less |
 | Codec call time under HTTP load | 68–70% less | 51–62% less |
 | HTTP request latency (k6 median) | 45–51% lower | 44–58% lower |
 | CPU per request | 43–48% less | 40–53% less |
 | Bytes allocated per request | 3–4% fewer at 64 KiB, about equal at 256 KiB, 9–10% more at 1 MiB | 7–28% fewer |
-| Highest sustained rate, 64 KiB (single ramp) | 2,500 → 6,000 rps | 4,500 → 10,800 rps |
-| Highest sustained rate, 256 KiB (single ramp) | 1,250 → 1,000 rps (ramp not trusted) | 2,250 → 3,938 rps |
-| Highest sustained rate, 1 MiB (single ramp) | 320 → ≥ 480 rps (goccy not saturated) | 900 → 1,200 rps |
-| Correctness deviations | 0 / 0 | 0 / 0 (byte-identical output) |
+| Highest sustained rate, 64 KiB (single ramp) | stdlib 2,500 rps, goccy 6,000 rps | stdlib 4,500 rps, goccy 10,800 rps |
+| Highest sustained rate, 256 KiB (single ramp) | stdlib 1,250 rps, goccy 1,000 rps (ramp not trusted) | stdlib 2,250 rps, goccy 3,938 rps |
+| Highest sustained rate, 1 MiB (single ramp) | stdlib 320 rps, goccy ≥ 480 rps (goccy not saturated) | stdlib 900 rps, goccy 1,200 rps |
+| Correctness deviations (stdlib / goccy) | 0 / 0 | 0 / 0 (byte-identical output) |
 
 ### Marshal (encode)
 `GET /batch`, default toolchain. Values are stdlib → goccy, with the change in brackets.
