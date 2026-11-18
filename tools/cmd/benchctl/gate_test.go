@@ -33,6 +33,7 @@ func TestGate(t *testing.T) {
 		{"achieved low", func(r *TrialResult) { r.K6["reqs"] = 989 }, "invalid", "achieved"},
 		{"non202 at limit", func(r *TrialResult) { r.K6["non_202"] = 1 }, "valid", ""},
 		{"non202 over", func(r *TrialResult) { r.K6["non_202"] = 2 }, "invalid", "non-202"},
+		{"non200 over (encode)", func(r *TrialResult) { r.Spec.Op = "encode"; r.K6["non_202"] = 2 }, "invalid", "non-200"},
 		{"transport", func(r *TrialResult) { r.K6["transport_errors"] = 1 }, "invalid", "transport"},
 		{"vus_max is not a per-scenario cap", func(r *TrialResult) { r.K6["vus_max"] = 1200 }, "valid", ""},
 		{"k6 cpu avg", func(r *TrialResult) {

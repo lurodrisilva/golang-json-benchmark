@@ -133,7 +133,13 @@ func gate(r *TrialResult) {
 	}
 	if s.Workload != "ramp" {
 		if f := r.K6["non_202"] / reqs; f > gateNon202Max {
-			r.invalid("non-202 fraction %.5f > %.3f", f, gateNon202Max)
+			// k6 counts any response other than the expected success status
+			// in non_202 (202 for POST /ingest, 200 for GET /batch).
+			want := 202
+			if s.encode() {
+				want = 200
+			}
+			r.invalid("non-%d fraction %.5f > %.3f", want, f, gateNon202Max)
 		}
 	}
 	if t := r.K6["transport_errors"]; t > 0 && s.Workload != "ramp" {
