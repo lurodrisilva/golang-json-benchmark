@@ -1,0 +1,49 @@
+{
+  "name": "pilot-encode",
+  "seed": 20261115,
+  "gomaxprocs": 4,
+  "cooldown": "120s",
+  "pre_vus": 100,
+  "max_vus": 400,
+  "cells": [
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "ramp",
+      "knee": 6000,
+      "steps": "10,20,35,50,65,80,90,100,120,150,200",
+      "step_dur": "2m",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f2-256k",
+      "workload": "ramp",
+      "knee": 1500,
+      "steps": "10,20,35,50,65,80,90,100,120,150,200",
+      "step_dur": "2m",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f3-1m",
+      "workload": "ramp",
+      "knee": 400,
+      "steps": "10,20,35,50,65,80,90,100,120,150,200",
+      "step_dur": "2m",
+      "reps": 1
+    }
+  ]
+}

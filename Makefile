@@ -7,6 +7,7 @@ MAKEFLAGS   += --no-builtin-rules
 BIN      ?= bin
 RESULTS  ?= results
 MATRIX   ?= loadtest/matrix/pilot.json
+comma    := ,
 RUN      ?= $(shell ls -1d $(RESULTS)/*/ 2>/dev/null | tail -1)
 COUNT    ?= 10
 BENCHCTL := $(BIN)/benchctl
@@ -59,16 +60,18 @@ conformance: ## Write conformance matrices (raw codec vs v1 spec) to reports/con
 	@mkdir -p reports/conformance
 	cd service && CONFORMANCE_OUT=$(CURDIR)/reports/conformance/conformance-default.tsv go test -count=1 -run TestCorpusRaw ./internal/conformance/
 	cd service && GOEXPERIMENT=nojsonv2 CONFORMANCE_OUT=$(CURDIR)/reports/conformance/conformance-nojsonv2.tsv go test -count=1 -run TestCorpusRaw ./internal/conformance/
+	cd service && ENCODE_CONFORMANCE_OUT=$(CURDIR)/reports/conformance/encode-conformance-default.tsv go test -count=1 -run TestEncodeCorpus ./internal/conformance/
+	cd service && GOEXPERIMENT=nojsonv2 ENCODE_CONFORMANCE_OUT=$(CURDIR)/reports/conformance/encode-conformance-nojsonv2.tsv go test -count=1 -run TestEncodeCorpus ./internal/conformance/
 
 .PHONY: fuzz
 fuzz: ## Fuzz the shared policy scanner for 60s
 	cd service && go test -run '^$$' -fuzz FuzzCheck -fuzztime 60s ./internal/policy/
 
 .PHONY: microbench
-microbench: ## Decoder-only benchmarks, COUNT reps each pair, benchstat summary
+microbench: ## Codec-only Unmarshal + Marshal benchmarks (nojsonv2: Unmarshal/Policy only, decision A3), COUNT reps each pair, benchstat summary
 	@mkdir -p reports/bench
 	cd service && go test -run '^$$' -bench . -benchmem -count=$(COUNT) ./bench/ | tee $(CURDIR)/reports/bench/default.txt
-	cd service && GOEXPERIMENT=nojsonv2 go test -run '^$$' -bench . -benchmem -count=$(COUNT) ./bench/ | tee $(CURDIR)/reports/bench/nojsonv2.txt
+	cd service && GOEXPERIMENT=nojsonv2 go test -run '^$$' -bench 'Unmarshal|Policy' -benchmem -count=$(COUNT) ./bench/ | tee $(CURDIR)/reports/bench/nojsonv2.txt
 	go run golang.org/x/perf/cmd/benchstat@v0.0.0-20261009192801-be2c69fb417e -col /codec reports/bench/default.txt > reports/bench/benchstat-default.txt || echo "benchstat unavailable; raw output kept"
 	go run golang.org/x/perf/cmd/benchstat@v0.0.0-20261009192801-be2c69fb417e -col /codec reports/bench/nojsonv2.txt > reports/bench/benchstat-nojsonv2.txt || true
 
@@ -91,7 +94,7 @@ run: build test ## Run MATRIX (pilot by default). Long-running; requires approva
 .PHONY: report
 report: tools ## Generate report for RUN (default: latest results dir)
 	@test -n "$(RUN)" || { echo "no run under $(RESULTS)"; exit 1; }
-	$(REPORT) -run $(RUN) -out $(RUN)/report \
+	$(REPORT) -run $(RUN) -out $(firstword $(subst $(comma), ,$(RUN)))/report \
 	  -bench reports/bench/benchstat-default.txt \
 	  -conformance reports/conformance -pprof
 

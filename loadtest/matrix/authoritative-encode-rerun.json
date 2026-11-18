@@ -1,0 +1,49 @@
+{
+  "name": "authoritative-encode-rerun",
+  "seed": 20261118,
+  "gomaxprocs": 4,
+  "cooldown": "120s",
+  "pre_vus": 100,
+  "max_vus": 400,
+  "cells": [
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "workload": "fixed",
+      "warmup": "60s",
+      "fixture": "f1-64k",
+      "rate": 4500,
+      "duration": "6m",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "workload": "fixed",
+      "warmup": "60s",
+      "fixture": "f3-1m",
+      "rate": 480,
+      "duration": "6m",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "workload": "fixed",
+      "warmup": "60s",
+      "fixture": "f1-64k",
+      "rate": 3600,
+      "duration": "6m",
+      "reps": 5
+    }
+  ]
+}

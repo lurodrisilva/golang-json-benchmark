@@ -14,6 +14,7 @@ import (
 	"net/http/pprof"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	rtmetrics "runtime/metrics"
@@ -37,6 +38,9 @@ type Config struct {
 	MgmtAddr      string
 	BodyLimit     int64
 	ShutdownGrace time.Duration
+	// EncodeFixture, when set, enables GET /batch serving this fixture's
+	// value (decoded with the arm's codec and digest-checked at startup).
+	EncodeFixture string
 }
 
 func parseFlags(args []string) (Config, error) {
@@ -46,6 +50,7 @@ func parseFlags(args []string) (Config, error) {
 	fs.StringVar(&c.MgmtAddr, "mgmt-addr", "127.0.0.1:6061", "management listener (loopback only)")
 	fs.Int64Var(&c.BodyLimit, "body-limit", DefaultBodyLimit, "max request body bytes")
 	fs.DurationVar(&c.ShutdownGrace, "shutdown-grace", 30*time.Second, "graceful shutdown timeout")
+	fs.StringVar(&c.EncodeFixture, "encode-fixture", "", "fixture JSON whose value GET /batch encodes (enables /batch)")
 	if err := fs.Parse(args); err != nil {
 		return c, err
 	}
@@ -61,8 +66,17 @@ func parseFlags(args []string) (Config, error) {
 
 // NewIngestHandler returns the /ingest handler mux (exported for tests).
 func NewIngestHandler(c codec.Codec, m *metrics.Set, bodyLimit int64) http.Handler {
+	return NewHandler(c, m, bodyLimit, nil)
+}
+
+// NewHandler returns the measured mux: /ingest always, and /batch when enc
+// is non-nil. enc is shared read-only by all requests.
+func NewHandler(c codec.Codec, m *metrics.Set, bodyLimit int64, enc *model.IngestBatch) http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/ingest", &ingestHandler{codec: c, m: m, bodyLimit: bodyLimit})
+	if enc != nil {
+		mux.Handle("/batch", &encodeHandler{codec: c, m: m, v: enc})
+	}
 	return mux
 }
 
@@ -126,11 +140,27 @@ func Run(c codec.Codec, args []string) int {
 		return 1
 	}
 
+	var enc *model.IngestBatch
+	encBytes := 0
+	if cfg.EncodeFixture != "" {
+		v, err := LoadEncodeValue(c, cfg.EncodeFixture)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			return 1
+		}
+		out, err := c.Marshal(v)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "encode selftest:", err)
+			return 1
+		}
+		enc, encBytes = v, len(out)
+	}
+
 	m := new(metrics.Set)
 	var ready atomic.Bool
 
 	srv := &http.Server{
-		Handler:           NewIngestHandler(c, m, cfg.BodyLimit),
+		Handler:           NewHandler(c, m, cfg.BodyLimit, enc),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       30 * time.Second,
 		WriteTimeout:      30 * time.Second,
@@ -142,6 +172,10 @@ func Run(c codec.Codec, args []string) int {
 	srv.Protocols = &p
 
 	manifest := Manifest(c)
+	if enc != nil {
+		// The load generator reads this to verify every response's length.
+		manifest += fmt.Sprintf("encode_fixture\t%s\nencode_bytes\t%d\n", filepath.Base(cfg.EncodeFixture), encBytes)
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/readyz", func(w http.ResponseWriter, _ *http.Request) {
 		if ready.Load() {

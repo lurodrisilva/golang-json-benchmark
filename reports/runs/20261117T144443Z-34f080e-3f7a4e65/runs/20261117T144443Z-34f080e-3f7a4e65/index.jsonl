@@ -1,0 +1,74 @@
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":1,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":2,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-01","reasons":null,"seq":3,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-01","reasons":null,"seq":4,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-02","reasons":null,"seq":5,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-02","reasons":null,"seq":6,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-03","reasons":null,"seq":7,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-03","reasons":null,"seq":8,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-04","reasons":["dropped_iterations=19158","achieved 0.8891 of offered (\u003c 0.99)"],"seq":9,"status":"invalid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-04","reasons":null,"seq":10,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480/rep-05","reasons":null,"seq":11,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480/rep-05","reasons":null,"seq":12,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200-prof-cpu/rep-01","reasons":["dropped_iterations=129613","achieved 0.9000 of offered (\u003c 0.99)","non-202 fraction 0.00282 \u003e 0.001","transport errors/timeouts=3290","k6 reqs 1598399 vs server received 1595109 (diff 0.0021)","profiling active: not a primary latency trial"],"seq":13,"status":"invalid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200-prof-cpu/rep-01","reasons":["dropped_iterations=32490","achieved 0.9749 of offered (\u003c 0.99)","profiling active: not a primary latency trial"],"seq":14,"status":"invalid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1125/rep-01","reasons":null,"seq":15,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1125/rep-01","reasons":null,"seq":16,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1125/rep-02","reasons":null,"seq":17,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1125/rep-02","reasons":null,"seq":18,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1125/rep-03","reasons":null,"seq":19,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1125/rep-03","reasons":null,"seq":20,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1125/rep-04","reasons":null,"seq":21,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1125/rep-04","reasons":null,"seq":22,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1125/rep-05","reasons":null,"seq":23,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1125/rep-05","reasons":null,"seq":24,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r300/rep-01","reasons":null,"seq":25,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r300/rep-01","reasons":null,"seq":26,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r300/rep-02","reasons":null,"seq":27,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r300/rep-02","reasons":null,"seq":28,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r300/rep-03","reasons":["host busy 11.2% before trial (top: WindowServer 18%, identityservicesd 17%, stable 9%, claude 9%, WallpaperAerialsExtension 7%)"],"seq":29,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r300/rep-03","reasons":null,"seq":30,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r300/rep-04","reasons":null,"seq":31,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r300/rep-04","reasons":["host busy 11.9% before trial (top: WindowServer 18%, corebrightnessd 13%, stable 12%, corespotlightd 11%, spotlightknowledged.updater 7%)"],"seq":32,"status":"flagged"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r300/rep-05","reasons":["host busy 10.9% before trial (top: WindowServer 32%, corebrightnessd 18%, stable 10%, ControlCenter 8%, com.apple.AmbientDisplayAgent 6%)"],"seq":33,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r300/rep-05","reasons":null,"seq":34,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-fixed-r480-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":35,"status":"flagged"}
+{"dir":"trials/stdlib/f3-1m/enc-fixed-r480-prof-cpu/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":36,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200-prof-allocs/rep-01","reasons":["host busy 31.3% before trial (top: corespotlightd 123%, contactsd 71%, contactsdonationagent 40%)","profiling active: not a primary latency trial"],"seq":37,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200-prof-allocs/rep-01","reasons":["profiling active: not a primary latency trial"],"seq":38,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-01","reasons":null,"seq":39,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-01","reasons":null,"seq":40,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-02","reasons":null,"seq":41,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-02","reasons":null,"seq":42,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-03","reasons":null,"seq":43,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-03","reasons":null,"seq":44,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-04","reasons":["host busy 19.4% before trial (top: corespotlightd 121%)"],"seq":45,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-04","reasons":["dropped_iterations=32698","achieved 0.9798 of offered (\u003c 0.99)"],"seq":46,"status":"invalid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-05","reasons":["host busy 27.4% before trial (top: mediaanalysisd 215%)"],"seq":47,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-05","reasons":null,"seq":48,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-ramp-k2250/rep-01","reasons":["host busy 25.4% before trial (top: contactsd 18%, contactsd 17%, contactsd 17%, launchd 16%, contactsd 16%)"],"seq":49,"status":"flagged"}
+{"dir":"trials/stdlib/f2-256k/enc-ramp-k2250/rep-01","reasons":["host busy 13.8% before trial (top: duetexpertd 89%, contactsd 10%)"],"seq":50,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200/rep-01","reasons":["dropped_iterations=726811","achieved 0.7196 of offered (\u003c 0.99)","transport errors/timeouts=870"],"seq":51,"status":"invalid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200/rep-01","reasons":["dropped_iterations=192341","achieved 0.9258 of offered (\u003c 0.99)","transport errors/timeouts=1710","host busy 12.9% before trial (top: knowledgeconstructiond 100%)"],"seq":52,"status":"invalid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200/rep-02","reasons":["host busy 13.0% before trial (top: spotlightknowledged 100%)"],"seq":53,"status":"flagged"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200/rep-02","reasons":["dropped_iterations=11230"],"seq":54,"status":"invalid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200/rep-03","reasons":["dropped_iterations=4900"],"seq":55,"status":"invalid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200/rep-03","reasons":null,"seq":56,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200/rep-04","reasons":null,"seq":57,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200/rep-04","reasons":null,"seq":58,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r7200/rep-05","reasons":null,"seq":59,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r7200/rep-05","reasons":null,"seq":60,"status":"valid"}
+{"dir":"trials/stdlib/f3-1m/enc-ramp-k600/rep-01","reasons":null,"seq":61,"status":"valid"}
+{"dir":"trials/goccy/f3-1m/enc-ramp-k600/rep-01","reasons":null,"seq":62,"status":"valid"}
+{"dir":"trials/goccy/f1-64k/enc-ramp-k9000/rep-01","reasons":null,"seq":63,"status":"valid"}
+{"dir":"trials/stdlib/f1-64k/enc-ramp-k9000/rep-01","reasons":["host busy 23.4% before trial (top: duetexpertd 29%, dasd 15%, launchd 13%, contactsd 12%, contactsd 11%)"],"seq":64,"status":"flagged"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1800/rep-01","reasons":null,"seq":65,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1800/rep-01","reasons":null,"seq":66,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1800/rep-02","reasons":null,"seq":67,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1800/rep-02","reasons":null,"seq":68,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1800/rep-03","reasons":null,"seq":69,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1800/rep-03","reasons":null,"seq":70,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1800/rep-04","reasons":null,"seq":71,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1800/rep-04","reasons":null,"seq":72,"status":"valid"}
+{"dir":"trials/goccy/f2-256k/enc-fixed-r1800/rep-05","reasons":null,"seq":73,"status":"valid"}
+{"dir":"trials/stdlib/f2-256k/enc-fixed-r1800/rep-05","reasons":null,"seq":74,"status":"valid"}

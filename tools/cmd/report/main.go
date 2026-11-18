@@ -36,6 +36,7 @@ type trial struct {
 		Profile  string `json:"profile"`
 		Variant  string `json:"variant"`
 		Duration string `json:"duration"`
+		Op       string `json:"op"` // "" (decode) | encode
 	} `json:"spec"`
 	Status   string             `json:"status"`
 	Reasons  []string           `json:"reasons"`
@@ -50,6 +51,7 @@ type trial struct {
 		DecodedOK float64 `json:"decoded_ok_in_window"`
 	} `json:"profiles"`
 	dir string
+	run string // run directory the trial was loaded from
 }
 
 // pair maps an arm to its pair and role. Baseline is always the stdlib arm.
@@ -67,12 +69,14 @@ func pair(arm string) (name string, baseline bool) {
 	return "?", false
 }
 
+// cellKey: libraries are only ever compared within one op, payload and load
+// test (user decision A3); decode and encode never share a cell.
 type cellKey struct {
-	Pair, Fixture, Workload, Point, Variant, Profile string
+	Op, Pair, Fixture, Workload, Point, Variant, Profile string
 }
 
 func (k cellKey) String() string {
-	s := fmt.Sprintf("Pair %s · %s · %s %s", k.Pair, k.Fixture, k.Workload, k.Point)
+	s := fmt.Sprintf("%s · Pair %s · %s · %s %s", opTitle(k.Op), k.Pair, k.Fixture, k.Workload, k.Point)
 	if k.Variant != "" {
 		s += " · variant=" + k.Variant
 	}
@@ -91,7 +95,21 @@ func keyOf(t *trial) cellKey {
 	case "ramp":
 		point = fmt.Sprintf("knee-ref %d", t.Spec.Knee)
 	}
-	return cellKey{p, t.Spec.Fixture, t.Spec.Workload, point, t.Spec.Variant, t.Spec.Profile}
+	return cellKey{opOf(t), p, t.Spec.Fixture, t.Spec.Workload, point, t.Spec.Variant, t.Spec.Profile}
+}
+
+func opOf(t *trial) string {
+	if t.Spec.Op == "encode" {
+		return "encode"
+	}
+	return "decode"
+}
+
+func opTitle(op string) string {
+	if op == "encode" {
+		return "Encode"
+	}
+	return "Decode"
 }
 
 // metric describes one reported value. lower=true → lower is better.
@@ -161,6 +179,69 @@ var fixedMetrics = func() []metric {
 	return ms
 }()
 
+// encodeMetrics: GET /batch cells. The response body is part of the measured
+// work here (it is the encoder's output), so k6 waiting/receiving are shown
+// separately. srv_ehdl ends before the body write; the write itself is shared
+// net/http code and is reported as a negative control.
+var encodeMetrics = func() []metric {
+	ms := []metric{}
+	for _, tr := range []struct{ id, label string }{
+		{"http_req_duration", "HTTP request duration (k6)"},
+		{"http_req_waiting", "HTTP time to first byte (k6 waiting)"},
+		{"http_req_receiving", "HTTP body receiving (k6)"},
+		{"srv_ehdl", "Encode handler duration (server, excl. write)"},
+		{"srv_enc", "Encode duration (Marshal only)"},
+	} {
+		for _, st := range []string{"min", "med", "avg", "p(95)", "p(99)", "max"} {
+			m := metric{Name: tr.label + " " + st, Unit: "ms", Src: "k6:" + tr.id + "{phase:measure}." + st, Lower: true, get: k6(tr.id + "." + st)}
+			if st == "p(99)" {
+				m.Minimum = p99MinSamples
+				id := tr.id
+				m.get = func(t *trial) (float64, bool) {
+					if t.K6[id+".count"] < p99MinSamples {
+						return 0, false
+					}
+					v, ok := t.K6[id+".p(99)"]
+					return v, ok
+				}
+			}
+			ms = append(ms, m)
+		}
+	}
+	perOp := func(key string, k float64) func(*trial) (float64, bool) {
+		return func(t *trial) (float64, bool) {
+			ok := t.Server["d_ops_ok"]
+			v, has := t.Server[key]
+			// v == 0: the minimal build takes no timestamps, so the sum is
+			// absent rather than a zero-cost write.
+			if !has || ok <= 0 || v <= 0 {
+				return 0, false
+			}
+			return v / ok * k, true
+		}
+	}
+	ms = append(ms,
+		metric{Name: "Response write per op (shared code, control) med", Unit: "ms", Src: "Δsum_write_ns / Δenc_ok", Lower: true, Control: true, get: perOp("d_sum_write_ns", 1e-6)},
+		metric{Name: "Response body size", Unit: "B", Src: "server encode_bytes (Content-Length; checked per response by k6)", Lower: true, get: srv("encode_bytes")},
+		metric{Name: "Achieved throughput", Unit: "req/s", Src: "k6 measured reqs / nominal window", Lower: false, get: k6("achieved_rps")},
+		metric{Name: "Server enc_ok rate", Unit: "op/s", Src: "Δenc_ok / window wall", Lower: false, get: srv("decoded_ok_per_s")},
+		metric{Name: "CPU time per successful op", Unit: "µs/op", Src: "getrusage Δ(utime+stime)/Δenc_ok", Lower: true, get: srv("cpu_us_per_op")},
+		metric{Name: "CPU utilization", Unit: "cores", Src: "getrusage Δ/window wall", Lower: true, get: srv("cpu_util_cores")},
+		metric{Name: "CPU-seconds in window", Unit: "s", Src: "getrusage Δ", Lower: true, get: srv("cpu_seconds")},
+		metric{Name: "Σ encode handler durations", Unit: "s", Src: "Σ sum_enc_handler_ns Δ", Lower: true, get: scale(srv("d_sum_enc_handler_ns"), 1e-9)},
+		metric{Name: "Σ encode durations", Unit: "s", Src: "Σ sum_encode_ns Δ", Lower: true, get: scale(srv("d_sum_encode_ns"), 1e-9)},
+		metric{Name: "Allocated bytes per op", Unit: "B/op", Src: "runtime/metrics /gc/heap/allocs:bytes Δ / Δenc_ok", Lower: true, get: srv("alloc_bytes_per_op")},
+		metric{Name: "Allocated objects per op", Unit: "obj/op", Src: "runtime/metrics /gc/heap/allocs:objects Δ / Δenc_ok", Lower: true, get: srv("alloc_objects_per_op")},
+	)
+	// GC and memory rows are identical in definition to the decode table.
+	for _, m := range fixedMetrics {
+		if strings.HasPrefix(m.Name, "GC ") || strings.Contains(m.Name, "heap") || strings.Contains(m.Name, "memory") || strings.Contains(m.Name, "RSS") {
+			ms = append(ms, m)
+		}
+	}
+	return ms
+}()
+
 func scale(f func(*trial) (float64, bool), k float64) func(*trial) (float64, bool) {
 	return func(t *trial) (float64, bool) { v, ok := f(t); return v * k, ok }
 }
@@ -219,7 +300,7 @@ type profileRow struct {
 }
 
 func main() {
-	run := flag.String("run", "", "benchctl run directory (required)")
+	run := flag.String("run", "", "benchctl run directory, or a comma-separated list (e.g. decode run,encode run); required")
 	out := flag.String("out", "", "output directory (default <run>/report)")
 	bench := flag.String("bench", "", "benchstat output to embed (optional)")
 	conf := flag.String("conformance", "", "directory with conformance-*.tsv matrices (optional)")
@@ -232,15 +313,20 @@ func main() {
 		fmt.Fprintln(os.Stderr, "report: -run is required")
 		os.Exit(2)
 	}
+	runs := strings.Split(*run, ",")
 	if *out == "" {
-		*out = filepath.Join(*run, "report")
+		*out = filepath.Join(runs[0], "report")
 	}
 	if err := os.MkdirAll(*out, 0o755); err != nil {
 		fail(err)
 	}
-	trials, err := load(*run)
-	if err != nil {
-		fail(err)
+	var trials []*trial
+	for _, r := range runs {
+		ts, err := load(r)
+		if err != nil {
+			fail(err)
+		}
+		trials = append(trials, ts...)
 	}
 	if len(trials) == 0 {
 		fail(fmt.Errorf("no trial.json under %s", *run))
@@ -250,23 +336,27 @@ func main() {
 	for _, c := range cells {
 		analyze(c, rng, *resamples, *threshold)
 		if *pprof {
-			profiles(c, *run, *out)
+			profiles(c, *out)
 		}
 	}
 	if err := writeCSV(filepath.Join(*out, "trials.csv"), trials); err != nil {
 		fail(err)
 	}
 	if err := writeJSON(filepath.Join(*out, "summary.json"), map[string]any{
-		"run": filepath.Base(*run), "threshold_pct": *threshold, "bootstrap": map[string]any{"seed": *seed, "resamples": *resamples},
+		"runs": runNames(runs), "threshold_pct": *threshold, "bootstrap": map[string]any{"seed": *seed, "resamples": *resamples},
 		"cells": cells,
 	}); err != nil {
 		fail(err)
 	}
-	ctx := reportCtx{Run: *run, Cells: cells, Trials: trials, Threshold: *threshold, Resamples: *resamples, Seed: *seed}
-	ctx.Env, _ = os.ReadFile(filepath.Join(*run, "env.json"))
-	ctx.Build, _ = os.ReadFile(filepath.Join(*run, "build.json"))
-	ctx.Matrix, _ = os.ReadFile(filepath.Join(*run, "matrix.json"))
-	ctx.Fixtures, _ = os.ReadFile(filepath.Join(*run, "fixtures.SHA256SUMS"))
+	ctx := reportCtx{Run: strings.Join(runNames(runs), ", "), Cells: cells, Trials: trials, Threshold: *threshold, Resamples: *resamples, Seed: *seed}
+	for _, r := range runs {
+		m := runMeta{Name: filepath.Base(filepath.Clean(r)), Dir: r}
+		m.Env, _ = os.ReadFile(filepath.Join(r, "env.json"))
+		m.Build, _ = os.ReadFile(filepath.Join(r, "build.json"))
+		m.Matrix, _ = os.ReadFile(filepath.Join(r, "matrix.json"))
+		m.Fixtures, _ = os.ReadFile(filepath.Join(r, "fixtures.SHA256SUMS"))
+		ctx.Runs = append(ctx.Runs, m)
+	}
 	if *bench != "" {
 		ctx.Bench, _ = os.ReadFile(*bench)
 	}
@@ -281,6 +371,14 @@ func main() {
 		fail(err)
 	}
 	fmt.Println(filepath.Join(*out, "report.md"))
+}
+
+func runNames(runs []string) []string {
+	out := make([]string, len(runs))
+	for i, r := range runs {
+		out[i] = filepath.Base(filepath.Clean(r))
+	}
+	return out
 }
 
 func fail(err error) {
@@ -301,7 +399,7 @@ func load(run string) ([]*trial, error) {
 		if err != nil {
 			return err
 		}
-		t := &trial{dir: filepath.Dir(p)}
+		t := &trial{dir: filepath.Dir(p), run: run}
 		if err := json.Unmarshal(b, t); err != nil {
 			return fmt.Errorf("%s: %w", p, err)
 		}
@@ -361,7 +459,11 @@ func onlyProfilingFlag(t *trial) bool {
 func analyze(c *cell, rng *rand.Rand, resamples int, threshold float64) {
 	switch c.Key.Workload {
 	case "fixed":
-		for _, m := range fixedMetrics {
+		ms := fixedMetrics
+		if c.Key.Op == "encode" {
+			ms = encodeMetrics
+		}
+		for _, m := range ms {
 			c.Compares = append(c.Compares, compare(m, c.Base, c.Cand, rng, resamples, threshold))
 		}
 		applyControls(c.Compares, threshold)
@@ -522,6 +624,11 @@ func steps(t *trial) []step {
 			P99:     t.K6["http_req_duration"+sel+".p(99)"],
 			DecMed:  t.K6["srv_dec"+sel+".med"],
 		}
+		if opOf(t) == "encode" {
+			// failed = status != 200 or wrong length; "DecMed" holds Marshal P50
+			s.Non202 = t.K6["non_200"+sel+".count"] + t.K6["bad_length"+sel+".count"]
+			s.DecMed = t.K6["srv_enc"+sel+".med"]
+		}
 		if dur > 0 {
 			s.Achieved = s.Count / dur
 		}
@@ -563,11 +670,11 @@ func knee(ss []step) string {
 	return best
 }
 
-func profiles(c *cell, run, out string) {
+func profiles(c *cell, out string) {
 	for _, t := range append(append([]*trial{}, c.Base...), c.Cand...) {
 		for _, p := range t.Profiles {
 			row := profileRow{Arm: t.Spec.Arm, Kind: p.Kind, File: filepath.Join(t.dir, p.File), Rep: t.Spec.Rep, DecodedOK: p.DecodedOK}
-			bin := filepath.Join(run, "bin", binName(t.Spec.Arm, t.Spec.Variant))
+			bin := filepath.Join(t.run, "bin", binName(t.Spec.Arm, t.Spec.Variant))
 			args := []string{"tool", "pprof", "-top", "-nodecount=20"}
 			if p.Kind == "allocs" {
 				args = append(args, "-sample_index=alloc_space")
@@ -578,7 +685,7 @@ func profiles(c *cell, run, out string) {
 			args = append(args, row.File)
 			if b, err := exec.Command("go", args...).Output(); err == nil {
 				row.Top = string(b)
-				name := fmt.Sprintf("pprof-%s-%s-%s-rep%02d-%s.txt", c.Key.Pair, t.Spec.Fixture, t.Spec.Arm, t.Spec.Rep, p.Kind)
+				name := fmt.Sprintf("pprof-%s-%s-%s-%s-rep%02d-%s.txt", opOf(t), c.Key.Pair, t.Spec.Fixture, t.Spec.Arm, t.Spec.Rep, p.Kind)
 				os.WriteFile(filepath.Join(out, name), b, 0o644)
 			} else {
 				row.Top = "go tool pprof failed: " + err.Error()
@@ -587,13 +694,13 @@ func profiles(c *cell, run, out string) {
 		}
 		if heap := filepath.Join(t.dir, "heap-end.pprof"); fileExists(heap) {
 			for _, idx := range []string{"inuse_space", "inuse_objects"} {
-				bin := filepath.Join(run, "bin", binName(t.Spec.Arm, t.Spec.Variant))
+				bin := filepath.Join(t.run, "bin", binName(t.Spec.Arm, t.Spec.Variant))
 				args := []string{"tool", "pprof", "-top", "-nodecount=15", "-sample_index=" + idx}
 				if fileExists(bin) {
 					args = append(args, bin)
 				}
 				if b, err := exec.Command("go", append(args, heap)...).Output(); err == nil {
-					name := fmt.Sprintf("pprof-%s-%s-%s-rep%02d-heap-%s.txt", c.Key.Pair, t.Spec.Fixture, t.Spec.Arm, t.Spec.Rep, idx)
+					name := fmt.Sprintf("pprof-%s-%s-%s-%s-rep%02d-heap-%s.txt", opOf(t), c.Key.Pair, t.Spec.Fixture, t.Spec.Arm, t.Spec.Rep, idx)
 					os.WriteFile(filepath.Join(out, name), b, 0o644)
 				}
 			}
@@ -685,7 +792,7 @@ func writeJSON(path string, v any) error {
 
 func loadConformance(dir string) map[string][]byte {
 	out := map[string][]byte{}
-	ms, _ := filepath.Glob(filepath.Join(dir, "conformance-*.tsv"))
+	ms, _ := filepath.Glob(filepath.Join(dir, "*conformance-*.tsv"))
 	for _, m := range ms {
 		if b, err := os.ReadFile(m); err == nil {
 			out[filepath.Base(m)] = b

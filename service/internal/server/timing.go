@@ -45,3 +45,24 @@ func appendDur(dst []byte, name string, d time.Duration) []byte {
 	dst = append(dst, ";dur="...)
 	return strconv.AppendFloat(dst, float64(d)/1e6, 'f', 3, 64)
 }
+
+// recordEncTimings accumulates encode sums and emits Server-Timing
+// "enc;dur=,ehdl;dur=" (ms). ehdl ends before the header commit, so it
+// excludes writing the response body (measured separately in recordWrite).
+func recordEncTimings(m *metrics.Set, w http.ResponseWriter, t0, t1, tEnd time.Time) {
+	enc, hdl := t1.Sub(t0), tEnd.Sub(t0)
+	m.SumEncodeNs.Add(int64(enc))
+	m.SumEncHandlerNs.Add(int64(hdl))
+	var b [64]byte
+	s := b[:0]
+	s = appendDur(s, "enc", enc)
+	s = append(s, ',')
+	s = appendDur(s, "ehdl", hdl)
+	w.Header()["Server-Timing"] = []string{string(s)}
+}
+
+// recordWrite adds the body-write duration (header commit → Write return)
+// to a server-side sum. It cannot be sent to the client in a header.
+func recordWrite(m *metrics.Set, start time.Time) {
+	m.SumWriteNs.Add(int64(time.Since(start)))
+}

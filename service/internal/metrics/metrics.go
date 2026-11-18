@@ -49,6 +49,18 @@ type Set struct {
 	SumDecodeNs   Counter
 	SumValidateNs Counter
 	SumHandlerNs  Counter
+
+	// Encode experiment (GET /batch). EncOK counts responses whose Write
+	// returned no error (server-side boundary, not client delivery).
+	EncRequests       Counter
+	EncOK             Counter
+	EncErrors         Counter
+	EncWriteErrors    Counter
+	EncRejectedMethod Counter
+	EncRespBytes      Counter
+	SumEncodeNs       Counter
+	SumEncHandlerNs   Counter
+	SumWriteNs        Counter
 }
 
 var rtNames = []string{
@@ -84,6 +96,10 @@ func (s *Set) Snapshot(dst []byte, impl string, startWall time.Time) []byte {
 		{"read_errors", &s.ReadErrors}, {"responded", &s.Responded}, {"inflight", &s.Inflight},
 		{"sum_read_ns", &s.SumReadNs}, {"sum_policy_ns", &s.SumPolicyNs}, {"sum_decode_ns", &s.SumDecodeNs},
 		{"sum_validate_ns", &s.SumValidateNs}, {"sum_handler_ns", &s.SumHandlerNs},
+		{"enc_requests", &s.EncRequests}, {"enc_ok", &s.EncOK}, {"enc_errors", &s.EncErrors},
+		{"enc_write_errors", &s.EncWriteErrors}, {"enc_rejected_method", &s.EncRejectedMethod},
+		{"enc_resp_bytes", &s.EncRespBytes}, {"sum_encode_ns", &s.SumEncodeNs},
+		{"sum_enc_handler_ns", &s.SumEncHandlerNs}, {"sum_write_ns", &s.SumWriteNs},
 	}
 	for _, c := range counters {
 		dst = num(dst, c.k, c.c.Load())

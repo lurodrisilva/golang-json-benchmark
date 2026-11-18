@@ -1,0 +1,28 @@
+File: stdlib-server
+Type: cpu
+Time: 2026-11-17 17:26:14 -03
+Duration: 60.14s, Total samples = 99.73s (165.83%)
+Showing nodes accounting for 87.92s, 88.16% of 99.73s total
+Dropped 265 nodes (cum <= 0.50s)
+Showing top 20 nodes out of 112
+      flat  flat%   sum%        cum   cum%
+    34.12s 34.21% 34.21%     34.12s 34.21%  syscall.rawsyscalln
+    21.41s 21.47% 55.68%     21.41s 21.47%  runtime.madvise
+     5.86s  5.88% 61.56%      5.86s  5.88%  runtime.kevent
+     5.60s  5.62% 67.17%      5.60s  5.62%  runtime.usleep
+     3.89s  3.90% 71.07%      3.89s  3.90%  runtime.pthread_kill
+     3.22s  3.23% 74.30%     23.24s 23.30%  encoding/json/v2.makeStructArshaler.func2
+     2.24s  2.25% 76.55%      2.24s  2.25%  runtime.pthread_cond_wait
+     2.07s  2.08% 78.62%      2.96s  2.97%  encoding/json/internal/jsonwire.AppendQuote
+     1.57s  1.57% 80.20%      1.57s  1.57%  runtime.pthread_cond_signal
+     1.28s  1.28% 81.48%      2.76s  2.77%  encoding/json/jsontext.(*encoderState).WriteToken
+     1.18s  1.18% 82.66%      1.18s  1.18%  runtime.memmove
+     0.88s  0.88% 83.55%      0.88s  0.88%  encoding/json/internal/jsonflags.Flags.Get
+     0.85s  0.85% 84.40%      4.54s  4.55%  encoding/json/v2.makeStringArshaler.func1
+     0.73s  0.73% 85.13%      0.73s  0.73%  internal/strconv.fmtEFG
+     0.57s  0.57% 85.70%      0.99s  0.99%  internal/strconv.setDigits
+     0.54s  0.54% 86.24%      0.54s  0.54%  internal/strconv.formatBase10
+     0.54s  0.54% 86.78%      0.54s  0.54%  runtime.procyieldAsm
+     0.53s  0.53% 87.32%      0.63s  0.63%  internal/runtime/maps.(*Iter).Next
+     0.42s  0.42% 87.74%      7.30s  7.32%  encoding/json/v2.makeMapArshaler.func2
+     0.42s  0.42% 88.16%      0.60s   0.6%  reflect.Value.Field

@@ -1,0 +1,9 @@
+{
+  "allow_dirty": false,
+  "git": {
+    "branch": "feat/encode",
+    "commit": "4f2c938e7bda2cc64af9482e3453be50ea982d96",
+    "dirty": "false"
+  },
+  "matrix_sha256": "92dbc890213a813d6f2feffc522a682e441f13c5baa2059fc347609b1f8e1ff1"
+}

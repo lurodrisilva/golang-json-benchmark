@@ -1,0 +1,22 @@
+File: stdlib-server
+Type: inuse_objects
+Time: 2026-11-16 17:39:53 -03
+Showing nodes accounting for 83243, 100% of 83275 total
+Dropped 13 nodes (cum <= 416)
+Showing top 15 nodes out of 35
+      flat  flat%   sum%        cum   cum%
+     32768 39.35% 39.35%      32768 39.35%  encoding/json/v2.makeString
+     32768 39.35% 78.70%      32768 39.35%  net/http.(*Server).Serve
+      9734 11.69% 90.39%       9734 11.69%  bufio.NewWriterSize
+      6174  7.41% 97.80%       6174  7.41%  runtime.mallocgc
+      1799  2.16%   100%       1799  2.16%  bufio.NewReaderSize (inline)
+         0     0%   100%       1799  2.16%  bufio.NewReader
+         0     0%   100%      32768 39.35%  encoding/json.Unmarshal (inline)
+         0     0%   100%      32768 39.35%  encoding/json/v2.Unmarshal
+         0     0%   100%      32768 39.35%  encoding/json/v2.makeSliceArshaler.func3
+         0     0%   100%      32768 39.35%  encoding/json/v2.makeStringArshaler.func2
+         0     0%   100%      32768 39.35%  encoding/json/v2.makeStructArshaler.func3
+         0     0%   100%      32768 39.35%  encoding/json/v2.unmarshalDecode
+         0     0%   100%      32768 39.35%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/codec/stdlib.Codec.Unmarshal
+         0     0%   100%      32768 39.35%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.(*ingestHandler).ServeHTTP
+         0     0%   100%      32768 39.35%  github.com/lurodrisilva/golang-json-encoding-benchmark/service/internal/server.Run.func5

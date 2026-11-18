@@ -32,3 +32,14 @@ Every response has an empty body. Negative-test traffic is never part of perform
 
 ## Known difference that is not a correctness issue
 go-json copies the input into a pooled, padded buffer before decoding. Decoded strings are copied out, so the result does not alias the request buffer (this is verified by a test). The pooled buffer is internal to the library and is a legitimate part of what is being compared.
+
+## Encode conformance (GET /batch)
+Expectations come from the documented `encoding/json` v1 `Marshal` semantics, not from comparing the two libraries (`service/internal/conformance/encode_test.go`, 33 cases):
+HTML escaping of `<`, `>`, `&` and escaping of U+2028/U+2029; short and `\u00XX` control escapes; `/` not escaped; float formatting (shortest round-trip, exponent at ≥1e21 and <1e-6, `-0`, extremes); NaN/±Inf → error; exact int64/int32 extremes; nil slice/map/pointer → `null` and empty → `[]`/`{}`; map keys sorted by bytes and HTML-escaped; struct field declaration order; no whitespace.
+
+The HTTP contract is: `GET /batch` → 200, `Content-Type: application/json`, an exact `Content-Length`, and no chunking. Any other method → 405 with `Allow: GET`. A Marshal error → 500. The encoded value is loaded once and refused at startup if its digest differs from the golden digest. It is shared read-only, and concurrent Marshal must neither change it nor produce different output (run under `-race`).
+
+### Results [M] (go1.27.4, go-json v0.12.0)
+- 0 deviations, across 2 codecs × 33 cases × {default, nojsonv2} (`reports/conformance/encode-conformance-*.tsv`).
+- The two libraries produce **byte-identical** output for every fixture: f1 65,008 B, f2 260,564 B, f3 1,044,267 B. Each output decodes back to the golden digest.
+- Invalid UTF-8 in a string depends on **GOEXPERIMENT**, not on the library. The default (v2-backed) build writes a raw U+FFFD. `nojsonv2` writes the escape `\ufffd`. goccy matches whichever one the build uses (it selects the behaviour with build tags). Fixtures contain only valid UTF-8, so this does not affect the benchmark.

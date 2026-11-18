@@ -1,0 +1,74 @@
+{
+  "name": "e2e-encode",
+  "seed": 20261115,
+  "gomaxprocs": 4,
+  "cooldown": "5s",
+  "pre_vus": 20,
+  "max_vus": 200,
+  "cells": [
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "smoke",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "fixed",
+      "rate": 100,
+      "duration": "20s",
+      "warmup": "5s",
+      "reps": 2
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "ramp",
+      "knee": 400,
+      "steps": "25,50,100",
+      "step_dur": "10s",
+      "reps": 1
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "fixed",
+      "rate": 100,
+      "duration": "70s",
+      "warmup": "5s",
+      "reps": 1,
+      "profile": "cpu"
+    },
+    {
+      "op": "encode",
+      "pair": [
+        "stdlib",
+        "goccy"
+      ],
+      "fixture": "f1-64k",
+      "workload": "fixed",
+      "rate": 100,
+      "duration": "10s",
+      "warmup": "5s",
+      "reps": 1,
+      "variant": "minimal"
+    }
+  ]
+}

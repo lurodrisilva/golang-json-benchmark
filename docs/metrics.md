@@ -24,3 +24,17 @@
 **Operation** means one POST that was successfully decoded and validated (`decoded_ok`). Attempted requests (`received`) are always kept separate from operations.
 
 **Instrumentation control.** Binaries built with `-tags minimal` take no timestamps and emit no Server-Timing header. Comparing their HTTP latency and CPU per op with the full-instrumentation build bounds the instrumentation overhead.
+
+## Encode experiment (GET /batch, plan docs/plan/encode-plan.md)
+
+| ID | Metric | Unit | Source / method | Boundary | Overhead |
+|---|---|---|---|---|---|
+| EA | `http_req_duration` (op=encode) | ms | k6 | Same definition as A. For a GET the request is tiny, so most of it is `http_req_waiting` (server time to first byte) and `http_req_receiving` (response body transfer). Both are reported. | k6 client |
+| EB | `srv_ehdl` | ms | `Server-Timing: ehdl` | Starts at handler entry. Ends after `Marshal` returns and the output is in hand, **before** headers are formatted and before the body is written. **Excludes** the response write. | 3 × `time.Now()` |
+| EC | `srv_enc` | ms | `Server-Timing: enc` | The `codec.Marshal` call only. It encodes a shared, read-only value that was loaded once at startup and digest-checked against the golden fixture digest. | — |
+| ED | Response write per op | ms | Δ`sum_write_ns` ÷ Δ`enc_ok` | The `w.Write` of the encoded bytes. This is shared code and acts as a **negative control**: it gets no library verdict. | 1 atomic add |
+| EE | Response body size | bytes | server manifest `encode_bytes` (startup selftest Marshal), checked per request by k6 (`bad_length`) | Bytes of the encoded body. Compared between libraries, never normalized (user decision A2). | — |
+| EF | Encode counters | count | `enc_requests`, `enc_ok`, `enc_errors`, `enc_write_errors`, `enc_rejected_method`, `enc_resp_bytes`, `sum_encode_ns`, `sum_enc_handler_ns`, `sum_write_ns` | `enc_ok` counts responses whose `Write` returned no error. This is server-side and does not prove client delivery. The k6 counts are `non_200` (status ≠ 200) and `bad_length` (body length ≠ `EXPECT_BYTES`). | padded atomics |
+| EP | Microbench | ns/op, B/op, allocs/op | `BenchmarkMarshal/fixture=/codec=` + benchstat | Only `Marshal` of the shared value. `SetBytes` = encoded size. | — |
+
+An encode **operation** is one GET /batch with `enc_ok` (a 200 with the full body written). Per-op metrics for encode cells (CPU/op, allocations/op) divide by Δ`enc_ok`. The report compares libraries only within the same operation, fixture and workload. It never compares encode figures with decode figures (user decision A3).

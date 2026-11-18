@@ -10,5 +10,8 @@ type Codec struct{}
 // Unmarshal calls json.Unmarshal and nothing else.
 func (Codec) Unmarshal(data []byte, v any) error { return json.Unmarshal(data, v) }
 
+// Marshal calls json.Marshal and nothing else.
+func (Codec) Marshal(v any) ([]byte, error) { return json.Marshal(v) }
+
 // Name identifies the arm.
 func (Codec) Name() string { return "stdlib" }

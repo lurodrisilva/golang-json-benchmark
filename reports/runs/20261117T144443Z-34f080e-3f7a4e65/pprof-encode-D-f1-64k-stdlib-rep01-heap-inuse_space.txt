@@ -1,0 +1,21 @@
+File: stdlib-server
+Type: inuse_space
+Time: 2026-11-17 17:35:15 -03
+Showing nodes accounting for 31883.26kB, 100% of 31883.26kB total
+Showing top 15 nodes out of 66
+      flat  flat%   sum%        cum   cum%
+10794.05kB 33.85% 33.85% 10794.05kB 33.85%  bufio.NewWriterSize (inline)
+ 9766.05kB 30.63% 64.49%  9766.05kB 30.63%  bufio.NewReaderSize (inline)
+ 6149.88kB 19.29% 83.77%  6149.88kB 19.29%  runtime.mallocgc
+ 1024.11kB  3.21% 86.99%  1024.11kB  3.21%  context.(*cancelCtx).Done
+  544.67kB  1.71% 88.69%   544.67kB  1.71%  bytes.Clone (inline)
+  532.26kB  1.67% 90.36%   532.26kB  1.67%  internal/poll.runtime_pollSetDeadline
+  512.10kB  1.61% 91.97%  1536.21kB  4.82%  context.(*cancelCtx).propagateCancel
+  512.07kB  1.61% 93.58%   512.07kB  1.61%  net/http.(*Server).newConn (inline)
+  512.03kB  1.61% 95.18% 23685.27kB 74.29%  net/http.(*conn).serve
+  512.02kB  1.61% 96.79%   512.02kB  1.61%  reflect.makemap
+  512.02kB  1.61% 98.39%   512.02kB  1.61%  syscall.anyToSockaddr
+  512.01kB  1.61%   100%  1536.09kB  4.82%  net/http.(*Server).Serve
+         0     0%   100%  9766.05kB 30.63%  bufio.NewReader (inline)
+         0     0%   100%  1536.21kB  4.82%  context.WithCancel
+         0     0%   100%  1536.21kB  4.82%  context.withCancel (inline)

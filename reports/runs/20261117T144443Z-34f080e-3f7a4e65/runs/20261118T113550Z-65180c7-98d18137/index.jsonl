@@ -1,0 +1,2 @@
+{"dir":"trials/stdlib/f1-64k/enc-fixed-r4500/rep-01","reasons":["host busy 30.7% before trial (top: corespotlightd 109%, node 78%, claude bg-spare 24%, WindowServer 11%, stable 7%)"],"seq":1,"status":"flagged"}
+{"dir":"trials/goccy/f1-64k/enc-fixed-r4500/rep-01","reasons":null,"seq":2,"status":"valid"}

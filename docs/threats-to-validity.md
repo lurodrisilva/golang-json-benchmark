@@ -15,6 +15,9 @@
 | T11 | The GC pause histogram has coarse buckets | Pause sums are lower bounds | The value is labeled as a lower bound | Low |
 | T12 | Profiling different binaries | Absolute sample counts cannot be compared | Compare shares within each profile. Profiling trials are flagged and excluded from latency claims | Documented |
 | T13 | Fixed rate taken from the slower arm's knee | The faster arm runs further below its own saturation point, which is intended | Saturation cells report each arm's own knee | Intended design |
+| T14 | Encode serializes one shared value, loaded once | Caches stay warm and nothing is allocated for input, so a server that builds a fresh value per request would see different costs | Same for both arms. The value is digest-checked, and Marshal is required not to mutate it (race test) | Documented: encode results describe Marshal of a resident value |
+| T15 | Encode response delivery runs over loopback | `http_req_receiving` for ~1 MiB bodies is far below what a real network would show | `srv_enc`/`srv_ehdl` exclude the write. The write is a shared-code control | Results do not transfer to real networks |
+| T16 | Encode cells come from a different run (date and thermal state) than the 2026-11-16 decode run | Absolute numbers cannot be compared across operations | The report compares libraries only within the same op, fixture and workload. Every run's manifest is shown | Intended design (decision A3) |
 
 ### Observation from the smoke-scale e2e run (not a result)
 

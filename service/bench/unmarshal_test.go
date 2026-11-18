@@ -1,4 +1,5 @@
-// Package bench holds decoder-only microbenchmarks. They measure Unmarshal of
+// Package bench holds codec-only microbenchmarks (Unmarshal and Marshal). The
+// Unmarshal benchmarks decode
 // identical fixture bytes into a fresh model.IngestBatch per iteration — the
 // same call the servers time as "dec". Fixture loading is outside the timer.
 // Conclusions from here are reported separately from HTTP results.
