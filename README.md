@@ -71,7 +71,7 @@ Ranges cover every fixed-load cell (Pair D, default toolchain) and the three pay
 
 \* 7,200 rps is above stdlib's 64 KiB encode saturation point (4,500 rps), so most stdlib trials there were invalid. Response sizes were identical for both libraries: 65,008 / 260,564 / 1,044,267 bytes.
 
-Marshal P99: P99 is the median over trials of each trial's 99th-percentile codec call time, measured on the server (every trial had at least 10,000 samples). The microbenchmarks report averages only, so they have no P99. P99 is noisier than the median: host stalls move it, which is why several cells were inconclusive for P99.
+Marshal P99 is the median across trials of each trial's 99th-percentile `Marshal` time, measured on the server; every trial had at least 10,000 samples. The microbenchmarks report only averages, so their rows show —. P99 is noisier than the median because occasional host stalls shift it.
 
 ### Unmarshal (decode)
 `POST /ingest`. Values are stdlib → goccy, with the change in brackets. A negative change means goccy used more.
@@ -91,7 +91,7 @@ Marshal P99: P99 is the median over trials of each trial's 99th-percentile codec
 
 † Both binaries built with `GOEXPERIMENT=nojsonv2` (the pre-v2 stdlib engine). This row is reported separately and is not comparable with the default-toolchain rows.
 
-Unmarshal P99: P99 is the median over trials of each trial's 99th-percentile codec call time, measured on the server (every trial had at least 10,000 samples). The microbenchmarks report averages only, so they have no P99. P99 is noisier than the median: host stalls move it, which is why several cells were inconclusive for P99.
+Unmarshal P99 is the median across trials of each trial's 99th-percentile `Unmarshal` time, measured on the server; every trial had at least 10,000 samples. The microbenchmarks report only averages, so their rows show —. P99 is noisier than the median because occasional host stalls shift it.
 
 ## Security and maintenance
 
